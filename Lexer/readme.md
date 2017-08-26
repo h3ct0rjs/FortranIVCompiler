@@ -13,5 +13,11 @@ You will need to have **python3.6** and sly library, we've created a bash script
 ```sh
 user@host:~$ git clone  https://github.com/h3ct0rjs/FortranIVCompiler
 user@host:~$ cd FortranIVCompiler/Lexer/
-user@host:~$ ./**run.sh**
+user@host:~$ ./run.sh
 ```
+
+
+
+## contact details
+
+*hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co*
