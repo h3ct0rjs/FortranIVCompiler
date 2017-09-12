@@ -27,9 +27,7 @@ command : variable '=' expr
         | CALL EXIT
         | CALL PDUMP '(' variable ',' variable ',' INTEGER ')'
         | CALL SLITE '(' INTEGER ')'
-        | CALL SLITET
         | CALL LINK '(' ID ')'
-        | CALL LOAD
         | READ '(' optionsIO ')' varlist
         | READ '(' optionsIO ')'
         | WRITE '(' optionsIO ')' varlist
@@ -119,7 +117,7 @@ formatOptions: formatOptions ',' formatOptions
         | '(' formatOptions ')'
         | INTEGER conversion
         | conversion
-        | string <--------------------------?
+        | string
         | empty
         ;
 
@@ -128,20 +126,10 @@ conversion: '(' conversion ')'
         | typeconversion
         ;
 
-typeconversion: INTEGER 'X'
-        | 'F' INTEGER '.' INTEGER
-        | 'E' INTEGER '.' INTEGER
-        | 'D' INTEGER '.' INTEGER
-        | 'I' INTEGER
-        | 'A' INTEGER
-        | 'T' INTEGER
-        | 'H' string <----------------------------?
-        ;
-
 typeconversion: INTEGER ID
         | ID INTEGER '.' INTEGER
         | ID INTEGER
-        | ID string <----------------------------?
+        | ID string
         ;
 
 dimensionOptions: dimensionOptions ',' ID '(' intlist ')'
