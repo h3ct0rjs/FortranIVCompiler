@@ -1,4 +1,4 @@
-# Grammar to Fortran IV Syntax Parser
+# Gramatica para FORTRAN IV
 
 program : program statement
         | statement
@@ -10,6 +10,7 @@ statement : INTEGER command
 
 command : variable '=' expr
         | GOTO INTEGER
+        | GOTO ID
         | GOTO '(' intlist ')' ',' variable
         | IF '(' relexpr ')' INTEGER ',' INTEGER ',' INTEGER
         | DO INTEGER variable '=' INTEGER ',' INTEGER ',' INTEGER
@@ -19,6 +20,7 @@ command : variable '=' expr
         | PAUSE INTEGER
         | STOP
         | STOP INTEGER
+        | RETURN
         | END
         | CALL ID '(' paramlist ')'
         | CALL EXIT '(' INTEGER ')'
@@ -44,6 +46,9 @@ command : variable '=' expr
         | EQUIVALENCE equivalOptions
         | DATA dataOptions
         | DEFINE FILE defFileOptions
+        | FUNCTION ID '(' varlist ')'
+        | SUBROUTINE ID '(' varlist ')'
+
         ;
 
 expr    : expr '+' expr
@@ -114,7 +119,7 @@ formatOptions: formatOptions ',' formatOptions
         | '(' formatOptions ')'
         | INTEGER conversion
         | conversion
-        | string
+        | string <--------------------------?
         | empty
         ;
 
@@ -123,10 +128,20 @@ conversion: '(' conversion ')'
         | typeconversion
         ;
 
+typeconversion: INTEGER 'X'
+        | 'F' INTEGER '.' INTEGER
+        | 'E' INTEGER '.' INTEGER
+        | 'D' INTEGER '.' INTEGER
+        | 'I' INTEGER
+        | 'A' INTEGER
+        | 'T' INTEGER
+        | 'H' string <----------------------------?
+        ;
+
 typeconversion: INTEGER ID
         | ID INTEGER '.' INTEGER
         | ID INTEGER
-        | ID string
+        | ID string <----------------------------?
         ;
 
 dimensionOptions: dimensionOptions ',' ID '(' intlist ')'
@@ -145,12 +160,16 @@ equivalOptions: equivalOptions ',' '(' paramlist ')'
         | '(' varlist ')'
         ;
 
-dataOptions: varlist '/' datalist '/' ',' dataOptions
-        | varlist '/' datalist '/'
+dataOptions: varlist ‘/’ datalist ‘/‘ ‘,’ dataOptions
+        | varlist ‘/‘ datalist ‘/‘
         ;
 
-datalist: datalist ',' INTEGER '*' NUMBER
-        | datalist ',' NUMBER
-        | INTEGER '*' NUMBER
-        | NUMBER
+datalist: datalist ‘,’ INTEGER ‘*’ number
+        | datalist ‘,’ number
+        | INTEGER ‘*’ number
+        | number
+        ;
+
+defFileOptions: defFileOptions, INTEGER '(' INTEGER ',' INTEGER ',' ID ',' ID ')'
+        | INTEGER '(' INTEGER ',' INTEGER ',' ID ',' ID ')'
         ;
