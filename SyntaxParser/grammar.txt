@@ -1,0 +1,156 @@
+# Grammar to Fortran IV Syntax Parser
+
+program : program statement
+        | statement
+        ;
+
+statement : INTEGER command
+        | command
+        ;
+
+command : variable '=' expr
+        | GOTO INTEGER
+        | GOTO '(' intlist ')' ',' variable
+        | IF '(' relexpr ')' INTEGER ',' INTEGER ',' INTEGER
+        | DO INTEGER variable '=' INTEGER ',' INTEGER ',' INTEGER
+        | DO INTEGER variable '=' INTEGER ',' INTEGER
+        | CONTINUE
+        | PAUSE
+        | PAUSE INTEGER
+        | STOP
+        | STOP INTEGER
+        | END
+        | CALL ID '(' paramlist ')'
+        | CALL EXIT '(' INTEGER ')'
+        | CALL EXIT
+        | CALL PDUMP '(' variable ',' variable ',' INTEGER ')'
+        | CALL SLITE '(' INTEGER ')'
+        | CALL SLITET
+        | CALL LINK '(' ID ')'
+        | CALL LOAD
+        | READ '(' optionsIO ')' varlist
+        | READ '(' optionsIO ')'
+        | WRITE '(' optionsIO ')' varlist
+        | BACKSPACE INTEGER
+        | BACKSPACE ID
+        | END FILE INTEGER
+        | END FILE ID
+        | INTEGER FORMAT '(' formatOptions ')'
+        | INTEGER exprlist
+        | REAL exprlist
+        | EXTERNAL paramlist
+        | DIMENSION dimensionOptions
+        | COMMON commonOptions
+        | EQUIVALENCE equivalOptions
+        | DATA dataOptions
+        | DEFINE FILE defFileOptions
+        ;
+
+expr    : expr '+' expr
+        | expr '-' expr
+        | expr '*' expr
+        | expr '/' expr
+        | expr '**' expr
+        | expr DS  expr
+        | '-' expr
+        | '(' expr ')'
+        | INTEGER
+        | REAL
+        | variable
+        ;
+
+
+exprlist: exprlist ',' expr
+        | expr
+        ;
+
+relexpr : expr LT expr
+        | expr LE expr
+        | expr GT expr
+        | expr GE expr
+        | expr EQ expr
+        | expr NE expr
+        | relexpr AND relexpr
+        | relexpr OR  relexpr
+        | NOT relexpr
+        ;
+
+variable: ID '(' expr, expr ')'
+        | ID '(' expr ')'
+        | ID
+        ;
+
+varlist : varlist ',' variable
+        | variable
+        ;
+
+paramlist : ID ',' paramlist
+        | ID
+
+number  : INTEGER
+        | REAL
+        | '-' INTEGER
+        | '-' REAL
+        ;
+
+numlist : numlist ',' number
+        | number
+        ;
+
+intlist : intlist ',' INTEGER
+        | INTEGER
+        ;
+
+optionsIO: INTEGER ',' INTEGER
+        | INTEGER "'" INTEGER
+        | ID ',' INTEGER
+        | ID "'" INTEGER
+        | INTEGER ',' '*'
+        | INTEGER "'" '*'
+        ;
+
+formatOptions: formatOptions ',' formatOptions
+        | formatOptions '/' formatOptions
+        | '(' formatOptions ')'
+        | INTEGER conversion
+        | conversion
+        | string
+        | empty
+        ;
+
+conversion: '(' conversion ')'
+        | conversion ',' typeconversion
+        | typeconversion
+        ;
+
+typeconversion: INTEGER ID
+        | ID INTEGER '.' INTEGER
+        | ID INTEGER
+        | ID string
+        ;
+
+dimensionOptions: dimensionOptions ',' ID '(' intlist ')'
+        | ID '(' intlist ')'
+        ;
+
+commonOptions: commonOptions ',' dimensionOptions
+        | commonOptions ',' paramlist
+        | dimensionOptions
+        | paramlist
+        ;
+
+equivalOptions: equivalOptions ',' '(' paramlist ')'
+        | equivalOptions ',' '(' varlist ')'
+        | '(' paramlist ')'
+        | '(' varlist ')'
+        ;
+
+dataOptions: varlist '/' datalist '/' ',' dataOptions
+        | varlist '/' datalist '/'
+        ;
+
+datalist: datalist ',' INTEGER '*' NUMBER
+        | datalist ',' NUMBER
+        | INTEGER '*' NUMBER
+        | NUMBER
+        ;
