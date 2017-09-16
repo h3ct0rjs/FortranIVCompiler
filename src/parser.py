@@ -105,26 +105,6 @@ class FortranParser(Parser):
     def command(self, p):
         pass
 
-    @_('CALL EXIT "(" INTEGER ")"')
-    def command(self, p):
-        pass
-
-    @_('CALL EXIT')
-    def command(self, p):
-        pass
-
-    @_('CALL PDUMP "(" variable "," variable "," INTEGER ")"')
-    def command(self, p):
-        pass
-
-    @_('CALL SLITE "(" INTEGER ")"')
-    def command(self, p):
-        pass
-
-    @_('CALL LINK "(" ID ")"')
-    def command(self, p):
-        pass
-
     @_('READ "(" optionsIO ")" varlist')
     def command(self, p):
         pass
@@ -494,6 +474,10 @@ class FortranParser(Parser):
     @_('number')
     def datalist(self, p):
         pass
+
+    @_('number')
+    def datalist(self, p):
+        pass
     '''  datalist Section'''
     @_('defFileOptions, INTEGER "(" INTEGER "," INTEGER "," ID "," ID ")"')
     def defFileOptions(self, p):
@@ -503,7 +487,7 @@ class FortranParser(Parser):
     @_('INTEGER "(" INTEGER "," INTEGER "," ID "," ID ")"')
     def defFileOptions(self, p):
         pass
-
+        
     def error(self, p):
         '''
         Trigger the  error if there is 
