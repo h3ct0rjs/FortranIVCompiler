@@ -35,8 +35,8 @@ class FortranLexer(Lexer):
     IF :
         IF expr, nl1,nl2,nl3
     '''
-    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'ELSE', 'FALSE', 'FIND', 'FORMAT',
-                      'FUNCTION', 'GOTO', 'IF', 'INTEGER', 'PROGRAM', 'PAUSE', 'READ', 'REAL', 'RETURN', 'SUBROUTINE', 'STOP', 'THEN', 'TRUE'}
+    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'FALSE', 'FILE', 'FORMAT', 'FUNCTION','GOTO',
+                    'IF', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     #'FIND', 'ELSE','THEN', 'PROGRAM'
     others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE'}
     logicaloperator = {'NOT', 'AND', 'OR'}
     # Set of token names.
@@ -66,10 +66,10 @@ class FortranLexer(Lexer):
     #ignore_comment = r'^C.*'
     PLUS = r'\+'
     MINUS = r'-'
-    EXPONENT = r'\*\*'
     TIMES = r'\*'
     DIVIDE = r'/'
     ASSIGN = r'='
+    EXPONENT = r'\*\*'
     LPAREN = r'\('
     RPAREN = r'\)'
     TRUE = r'\.TRUE\.',
