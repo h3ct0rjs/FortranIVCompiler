@@ -1,441 +1,144 @@
 # Lexical Analyzer, FortranIV Compiler
 # Compiler Course, UTP 2017-2
 # hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
-from sly import Parser
-from lexer import FortranLexer
-'''
-NOTES :
-    *In order to achieve speed I've stablished section to made my life more easier
-    using find, search and replace.
-
-'''
-
-
-class FortranParser(Parser):
-    #debugfile = 'parser.out'  # control de depuración
-
-    #def __init__(self):
-    #    self.errorStatus = False
-    tokens = FortranLexer.tokens
-    #start = 'program'
-
-    precedence = (
-        ('left', 'PLUS', 'MINUS'),
-        ('left', 'TIMES', 'DIVIDE'),
-    )
+from sly import Lexer
+import sys
+from decimal import Decimal as dp
+# We inherit from Lexer
+# Reserved Keywords based on
+class FortranLexer(Lexer):
     '''
-    See grammar.txt file for more details
+    Lexical Analyzer for our miniFortranIV(Formula Translation 1130/1800)
+    compiler, the elements identified for the Fortran Language in the documents
+    are :
+     -constants
+     -variables
+     -arrays
+     -arithmetic operators
+     -statements
+
+     Fortran statements are written in a line of width 80 maximun,
+     for our Fortran Compiler we use as follow :
+        1..5: min range 1, max range 99999
+        6:must be zero or blank
+        7-72: your statements
+        73-80: not used
+    Notes:
+    *Comments start with cC.
+    REAL: With maximun 15 digits after the period
+    GO TO:
+        GO TO Number label: Goto to the line
+        GO TO (nl1, nl2, nl3), i where i indicate where label to jump.
+    IF :
+        IF expr, nl1,nl2,nl3
     '''
-
-    '''program Section'''
-    @_('program statement')
-    def program(self, p):
-        pass
-
-    @_('statement')
-    def program(self, p):
-        pass
-
-    '''statement Section'''
-    @_('INTEGER command')
-    def statement(self, p):
-        pass
-
-    @_('command')
-    def statement(self, p):
-        pass
-
-    '''command Section'''
-    @_('variable ASSIGN expr')
-    def command(self, p):
-        pass
-
-    @_('GOTO INTEGER')
-    def command(self, p):
-        pass
-
-    @_('GOTO ID')
-    def command(self, p):
-        pass
-
-    @_('GOTO LPAREN intlist RPAREN "," variable')
-    def command(self, p):
-        pass
-
-    @_('IF LPAREN relexpr RPAREN INTEGER "," INTEGER "," INTEGER')
-    def command(self, p):
-        pass
-
-    @_('DO INTEGER variable ASSIGN INTEGER "," INTEGER "," INTEGER')
-    def command(self, p):
-        pass
-
-    @_('DO INTEGER variable ASSIGN INTEGER "," INTEGER')
-    def command(self, p):
-        pass
-
-    @_('CONTINUE')
-    def command(self, p):
-        pass
-
-    @_('PAUSE')
-    def command(self, p):
-        pass
-
-    @_('PAUSE INTEGER')
-    def command(self, p):
-        pass
-
-    @_('STOP')
-    def command(self, p):
-        pass
-
-    @_('STOP INTEGER')
-    def command(self, p):
-        pass
-
-    @_('RETURN')
-    def command(self, p):
-        pass
-
-    @_('END')
-    def command(self, p):
-        pass
-
-    @_('CALL ID LPAREN paramlist RPAREN')
-    def command(self, p):
-        pass
-
-    @_('READ LPAREN optionsIO RPAREN varlist')
-    def command(self, p):
-        pass
-
-    @_('READ LPAREN optionsIO RPAREN')
-    def command(self, p):
-        pass
-
-    @_('WRITE LPAREN optionsIO RPAREN varlist')
-    def command(self, p):
-        pass
-
-    @_('END FILE INTEGER')
-    def command(self, p):
-        pass
-
-    @_('END FILE ID')
-    def command(self, p):
-        pass
-
-    @_('INTEGER FORMAT LPAREN formatOptions RPAREN')
-    def command(self, p):
-        pass
-
-    @_('INTEGER exprlist')
-    def command(self, p):
-        pass
-
-    @_('REAL exprlist')
-    def command(self, p):
-        pass
-
-    @_('DIMMENSION dimmensionOptions')
-    def command(self, p):
-        pass
-
-    @_('DATA dataOptions')
-    def command(self, p):
-        pass
-
-    @_('FUNCTION ID LPAREN varlist RPAREN')
-    def command(self, p):
-        pass
-
-    @_('SUBROUTINE ID LPAREN varlist RPAREN')
-    def command(self, p):
-        pass
-
-    '''expr Section'''
-    @_('expr PLUS expr')
-    def expr(self, p):
-        pass
-
-    @_('expr MINUS expr')
-    def expr(self, p):
-        pass
-
-    @_('expr TIMES expr')
-    def expr(self, p):
-        pass
-
-    @_('expr DIVIDE expr')
-    def expr(self, p):
-        pass
-
-    @_('expr EXPONENT expr')
-    def expr(self, p):
-        pass
-
-    '''
-    @_('expr DS  expr')
-    def expr(self, p):
-        pass
-    '''
-
-    @_('MINUS expr')
-    def expr(self, p):
-        pass
-
-    @_('LPAREN expr RPAREN')
-    def expr(self, p):
-        pass
-
-    @_('INTEGER')
-    def expr(self, p):
-        pass
-
-    @_('REAL')
-    def expr(self, p):
-        pass
-
-    @_('variable')
-    def expr(self, p):
-        pass
-
-    '''  exprlist Section'''
-    @_('exprlist "," expr')
-    def exprlist(self, p):
-        pass
-
-    @_('expr')
-    def exprlist(self, p):
-        pass
-
-    '''  relexpr Section'''
-    @_('expr LT expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr LE expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr GT expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr GE expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr EQ expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr NE expr')
-    def relexpr(self, p):
-        pass
-
-    @_('relexpr AND relexpr')
-    def relexpr(self, p):
-        pass
-
-    @_('relexpr OR  relexpr')
-    def relexpr(self, p):
-        pass
-
-    @_('NOT relexpr')
-    def relexpr(self, p):
-        pass
-
-    '''  variable Section'''
-    @_('ID LPAREN expr "," expr RPAREN')
-    def variable(self, p):
-        pass
-
-    @_('ID LPAREN expr RPAREN')
-    def variable(self, p):
-        pass
-
-    @_('ID')
-    def variable(self, p):
-        pass
-
-    '''  varlist Section'''
-    @_(' varlist "," variable')
-    def varlist(self, p):
-        pass
-
-    @_('variable')
-    def varlist(self, p):
-        pass
-
-    '''  paramlist Section'''
-    @_('ID "," paramlist')
-    def paramlist(self, p):
-        pass
-
-    @_('ID')
-    def paramlist(self, p):
-        pass
-
-    '''  number Section'''
-    @_('INTEGER')
-    def number(self, p):
-        pass
-
-    @_('REAL')
-    def number(self, p):
-        pass
-
-    @_('MINUS INTEGER')
-    def number(self, p):
-        pass
-
-    @_('MINUS REAL')
-    def number(self, p):
-        pass
-
-    '''  numlist Section'''
-
-
-    '''  intlist Section'''
-    @_('intlist "," INTEGER')
-    def intlist(self, p):
-        pass
-
-    @_('INTEGER')
-    def intlist(self, p):
-        pass
-
-    '''  optionsIO Section'''
-    @_('INTEGER "," INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('INTEGER "\'" INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('ID "," INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('ID "\'" INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('INTEGER "," "*"')
-    def optionsIO(self, p):
-        pass
-
-    @_('INTEGER "\'" "*"')
-    def optionsIO(self, p):
-        pass
-
-    
-    # revisar
-    ''' formatOptions Section '''
-    @_('formatOptions "," formatOptions')
-    def formatOptions(self, p):
-        pass
-
-    @_('formatOptions "/" formatOptions')
-    def formatOptions(self, p):
-        pass
-
-    @_('LPAREN formatOptions RPAREN')
-    def formatOptions(self, p):
-        pass
-
-    @_('INTEGER conversion')
-    def formatOptions(self, p):
-        pass
-
-    @_('conversion')
-    def formatOptions(self, p):
-        pass
-
-    @_('string')
-    def formatOptions(self, p):
-        pass
-
-    @_('empty')
-    def formatOptions(self, p):
-        pass
-
-    # conversion Section
-    @_('LPAREN conversion RPAREN')
-    def conversion(self, p):
-        pass
-
-    @_('conversion "," typeconversion')
-    def conversion(self, p):
-        pass
-
-    @_('typeconversion')
-    def conversion(self, p):
-        pass
-
-    # typeconversion Section
-    @_('INTEGER ID')
-    def typeconversion(self, p):
-        pass
-
-    @_('ID INTEGER "." INTEGER')
-    def typeconversion(self, p):
-        pass
-
-    @_('ID INTEGER')
-    def typeconversion(self, p):
-        pass
-
-    @_('ID string')
-    def typeconversion(self, p):
-        pass
-    ''' end formatOptions Section'''
-
-    '''  dimmensionOptions Section'''
-    @_('dimmensionOptions "," ID LPAREN intlist RPAREN')
-    def dimmensionOptions(self, p):
-        pass
-
-    @_('ID LPAREN intlist RPAREN')
-    def dimmensionOptions(self, p):
-        pass
-    
-    '''  dataOptions Section'''
-    @_('varlist "/" datalist "/" "," dataOptions')
-    def dataOptions(self, p):
-        pass
-
-    @_('varlist "/" datalist "/"')
-    def dataOptions(self, p):
-        pass
-    
-    #revisar
-    '''  datalist Section'''
-    @_('datalist "," INTEGER "*" number')
-    def datalist(self, p):
-        pass
-
-    @_('datalist "," number')
-    def datalist(self, p):
-        pass
-
-    @_('INTEGER "*" number')
-    def datalist(self, p):
-        pass
-
-    @_('number')
-    def datalist(self, p):
-        pass
-    '''  datalist Section'''
-
-    def error(self, p):
-        '''
-        #Trigger the  error if there is 
-        '''
-        print("There was an Error Reading the Grammar!.")
-        if not p:
-            print("End of File!")
-            return
+    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'EXIT', 'FALSE', 'FORMAT', 'FUNCTION','GOTO',
+                    'IF', 'INT', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RREAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     # 'FILE','FIND', 'ELSE','THEN', 'PROGRAM'
+    others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE','empty'}
+    logicaloperator = {'NOT', 'AND', 'OR','string'}
+    # Set of token names.
+    tokens = {
+        'ID',
+        'PLUS',
+        'MINUS',
+        'TIMES',
+        'DIVIDE',
+        'EXPONENT',
+        'ASSIGN',
+        'LPAREN',
+        'RPAREN',
+        *reserved_words,  # Extend the actual tokens
+        *logicaloperator,
+        *others,
+    }
+
+    # Lines star1ting with C or c will be
+    # String containing ignored characters between tokens
+    ignore = ' \t\r'
+    # Set of valid characters
+    literals = {'+', '-', '*', '/', '=', '(', ')', '.', ','}
+    # Regular expression rules for tokens.
+    # The idea is to match all the coincidences based on 1130/1800 ibm manual.
+    #HEXA = r'(0[xX])?[0-9a-fA-F]+'
+    # Ignores
+    #ignore_comment = r'^C.*'
+
+    PLUS = r'\+'
+    MINUS = r'-'
+    TIMES = r'\*'
+    DIVIDE = r'/'
+    ASSIGN = r'='
+    EXPONENT = r'\*\*'
+    LPAREN = r'\('
+    RPAREN = r'\)'
+    TRUE = r'\.TRUE\.',
+    FALSE = r'\.FALSE\.',
+    NOT = r'\.NOT\.'
+    AND = r'\.AND\.'
+    OR = r'\.OR\.'
+    EQ = r'\.EQ\.'
+    GT = r'\.GT\.'
+    LE = r'\.LE\.'
+    LT = r'\.LT\.'
+    GE = r'\.GE\.'
+    NE = r'\.NE\.'
+    DP = r'DOUBLE\sPRECISION'
+    # Triggered action
+    # if the action is triggered you won't need the above expression, or I
+    # guess.
+    # Ignore sNew Lines
+    @_(r'CALL')
+    def CALL(self, t):
+        if t.value in self.reserved_words:
+            t.type = t.value.upper()
+        return t
+
+    @_(r'(\n[Cc] *.*)| (^[Cc] *.*)')
+    #@_(r"[cC] *.*")
+    def ignore_comment(self, p):
+        pass
+
+    @_(r"^C[^a-zA-Z0-9_=]{1}.*")
+    def t_comment(self, p):
+        pass
+
+    @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
+    def ID(self, t):
+        if t.value in self.reserved_words:
+            t.type = t.value.upper()
+        return t
+
+    @_(r'[-+]?([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+')
+    def RREAL(self, t):
+        t.value = float(t.value)   # Convert to a numeric value
+        return t
+
+    @_(r'[+-]?[\d]+')
+    def INT(self, t):
+        t.value = int(t.value)   # Convert to a numeric value
+        return t
+
+    # Sets Dp as double precission instance
+    @_(r"DOUBLE\sPRECISION")
+    def DP(self, t):
+        return t
+
+    # Line number tracking
+    @_(r'\n+')
+    def ignore_newline(self, t):
+        self.lineno += t.value.count('\n')
+
+
+
+    # Triggers the error
+    def error(self, value):
+        print('Line {}: Bad character {}'.format(self.lineno, value[0]))
+        self.index += 1
+
+    def test(self, data):
+        """
+        Unitary test
+        """
+        for tok in lexer.tokenize(data):
+            print('type={} value={}'.format(tok.type, tok.value))
+        print("DONE")
