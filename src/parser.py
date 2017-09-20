@@ -12,12 +12,12 @@ NOTES :
 
 
 class FortranParser(Parser):
-    debugfile = 'parser.out'  # control de depuración
+    #debugfile = 'parser.out'  # control de depuración
 
-    def __init__(self):
-        self.errorStatus = False
+    #def __init__(self):
+    #    self.errorStatus = False
     tokens = FortranLexer.tokens
-    start = 'program'
+    #start = 'program'
 
     precedence = (
         ('left', 'PLUS', 'MINUS'),
@@ -296,13 +296,7 @@ class FortranParser(Parser):
         pass
 
     '''  numlist Section'''
-    @_('numlist "," number')
-    def numlist(self, p):
-        pass
 
-    @_('number')
-    def numlist(self, p):
-        pass
 
     '''  intlist Section'''
     @_('intlist "," INTEGER')

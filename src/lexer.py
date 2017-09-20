@@ -1,9 +1,6 @@
 # Lexical Analyzer, FortranIV Compiler
 # Compiler Course, UTP 2017-2
 # hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
-# Lexical Analyzer, FortranIV Compiler
-# Compiler Course, UTP 2017-2
-# hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
 from sly import Lexer
 import sys
 from decimal import Decimal as dp
@@ -37,8 +34,8 @@ class FortranLexer(Lexer):
     '''
     reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'FALSE', 'FILE', 'FORMAT', 'FUNCTION','GOTO',
                     'IF', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     #'FIND', 'ELSE','THEN', 'PROGRAM'
-    others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE'}
-    logicaloperator = {'NOT', 'AND', 'OR'}
+    others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE','empty'}
+    logicaloperator = {'NOT', 'AND', 'OR','string'}
     # Set of token names.
     tokens = {
         'ID',
@@ -54,6 +51,7 @@ class FortranLexer(Lexer):
         *logicaloperator,
         *others,
     }
+
     # Lines star1ting with C or c will be
     # String containing ignored characters between tokens
     ignore = ' \t\r'
@@ -64,6 +62,7 @@ class FortranLexer(Lexer):
     #HEXA = r'(0[xX])?[0-9a-fA-F]+'
     # Ignores
     #ignore_comment = r'^C.*'
+
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
@@ -122,7 +121,6 @@ class FortranLexer(Lexer):
     # Sets Dp as double precission instance
     @_(r"DOUBLE\sPRECISION")
     def DP(self, t):
-        t.value = dp(t.value)
         return t
 
     # Line number tracking
