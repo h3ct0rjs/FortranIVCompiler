@@ -4,61 +4,69 @@ program : program statement
         | statement
         ;
 
-statement : INTEGER command
+statement : INT command
         | command
         ;
 
-command : variable '=' expr
-        | GOTO INTEGER
-        | GOTO ID
-        | GOTO '(' intlist ')' ',' variable
-        | IF '(' relexpr ')' INTEGER ',' INTEGER ',' INTEGER
-        | DO INTEGER variable '=' INTEGER ',' INTEGER ',' INTEGER
-        | DO INTEGER variable '=' INTEGER ',' INTEGER
+command : variable ASSIGN expr
+        | CALL callOption
         | CONTINUE
-        | PAUSE
-        | PAUSE INTEGER
-        | STOP
-        | STOP INTEGER
-        | RETURN
+        | DATA dataOption
+        | DIMMENSION dimmensionOption
+        | DO doOption
         | END
-        | CALL ID '(' paramlist ')'
-        | CALL EXIT '(' INTEGER ')'
-        | CALL EXIT
-        | CALL PDUMP '(' variable ',' variable ',' INTEGER ')'
-        | CALL SLITE '(' INTEGER ')'
-        | CALL LINK '(' ID ')'
-        | READ '(' optionsIO ')' varlist
-        | READ '(' optionsIO ')'
-        | WRITE '(' optionsIO ')' varlist
-        | BACKSPACE INTEGER
-        | BACKSPACE ID
-        | END FILE INTEGER
-        | END FILE ID
-        | INTEGER FORMAT '(' formatOptions ')'
+        | FORMAT LPAREN formatOptions RPAREN
+        | FUNCTION ID LPAREN varlist RPAREN
+        | GOTO gotoOption
+        | IF LPAREN relexpr RPAREN INT ',' INT ',' INT
         | INTEGER exprlist
+        | PAUSE pauseOption
+        | READ readOption
         | REAL exprlist
-        | EXTERNAL paramlist
-        | DIMENSION dimensionOptions
-        | COMMON commonOptions
-        | EQUIVALENCE equivalOptions
-        | DATA dataOptions
-        | DEFINE FILE defFileOptions
-        | FUNCTION ID '(' varlist ')'
-        | SUBROUTINE ID '(' varlist ')'
-
+        | RETURN
+        | SUBROUTINE ID LPAREN varlist RPAREN
+        | STOP stopOption
+        | WRITE LPAREN optionsIO RPAREN varlist
         ;
 
-expr    : expr '+' expr
-        | expr '-' expr
-        | expr '*' expr
-        | expr '/' expr
-        | expr '**' expr
-        | expr DS  expr
-        | '-' expr
-        | '(' expr ')'
-        | INTEGER
-        | REAL
+gotoOption: INT
+        |ID
+        | LPAREN intlist RPAREN ',' variable
+        ;
+
+doOption: INT variable ASSIGN INT ',' INT ',' INT
+        | INT variable ASSIGN INT ',' INT
+        ;
+
+pauseOption: INT
+        | empty
+        ;
+
+stopOption: INT
+        | empty
+        ;
+
+callOption: ID LPAREN paramlist RPAREN
+        | EXIT callExit
+        ;
+
+callExit: LPAREN INT RPAREN
+        | empty
+        ;
+
+readOption: LPAREN optionsIO RPAREN varlist
+        | LPAREN optionsIO RPAREN
+        ;
+
+expr    : expr PLUS expr
+        | expr MINUS expr
+        | expr TIMES expr
+        | expr DIVIDE expr
+        | expr EXPONENT expr
+        | MINUS expr
+        | LPAREN expr RPAREN
+        | INT
+        | RREAL
         | variable
         ;
 
@@ -78,8 +86,8 @@ relexpr : expr LT expr
         | NOT relexpr
         ;
 
-variable: ID '(' expr, expr ')'
-        | ID '(' expr ')'
+variable: ID LPAREN expr ',' expr RPAREN
+        | ID LPAREN expr RPAREN
         | ID
         ;
 
@@ -90,74 +98,56 @@ varlist : varlist ',' variable
 paramlist : ID ',' paramlist
         | ID
 
-number  : INTEGER
-        | REAL
-        | '-' INTEGER
-        | '-' REAL
+number  : INT
+        | RREAL
+        | MINUS INT
+        | MINUS RREAL
         ;
 
-numlist : numlist ',' number
-        | number
+intlist : intlist ',' INT
+        | INT
         ;
 
-intlist : intlist ',' INTEGER
-        | INTEGER
+optionsIO: INT ',' INT
+        | INT "'" INT
+        | ID ',' INT
+        | ID "'" INT
+        | INT ',' '*'
+        | INT "'" '*'
         ;
 
-optionsIO: INTEGER ',' INTEGER
-        | INTEGER "'" INTEGER
-        | ID ',' INTEGER
-        | ID "'" INTEGER
-        | INTEGER ',' '*'
-        | INTEGER "'" '*'
-        ;
-
+-----------------------------------------------------------------
 formatOptions: formatOptions ',' formatOptions
         | formatOptions '/' formatOptions
-        | '(' formatOptions ')'
-        | INTEGER conversion
+        | LPAREN formatOptions RPAREN
+        | INT conversion
         | conversion
         | string
         | empty
         ;
 
-conversion: '(' conversion ')'
+conversion: LPAREN conversion RPAREN
         | conversion ',' typeconversion
         | typeconversion
         ;
 
-typeconversion: INTEGER ID
-        | ID INTEGER '.' INTEGER
-        | ID INTEGER
+typeconversion: INT ID
+        | ID INT '.' INT
+        | ID INT
         | ID string
         ;
+------------------------------------------------------------------
 
-dimensionOptions: dimensionOptions ',' ID '(' intlist ')'
-        | ID '(' intlist ')'
+dimmensionOption: dimmensionOption ',' ID LPAREN intlist RPAREN
+        | ID LPAREN intlist RPAREN
         ;
 
-commonOptions: commonOptions ',' dimensionOptions
-        | commonOptions ',' paramlist
-        | dimensionOptions
-        | paramlist
-        ;
-
-equivalOptions: equivalOptions ',' '(' paramlist ')'
-        | equivalOptions ',' '(' varlist ')'
-        | '(' paramlist ')'
-        | '(' varlist ')'
-        ;
-
-dataOptions: varlist ‘/’ datalist ‘/‘ ‘,’ dataOptions
+dataOption: varlist ‘/’ datalist ‘/‘ ‘,’ dataOption
         | varlist ‘/‘ datalist ‘/‘
         ;
 
-datalist: datalist ‘,’ INTEGER ‘*’ number
+datalist: datalist ‘,’ INT ‘*’ number
         | datalist ‘,’ number
-        | INTEGER ‘*’ number
+        | INT ‘*’ number
         | number
-        ;
-
-defFileOptions: defFileOptions, INTEGER '(' INTEGER ',' INTEGER ',' ID ',' ID ')'
-        | INTEGER '(' INTEGER ',' INTEGER ',' ID ',' ID ')'
         ;
