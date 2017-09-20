@@ -4,7 +4,6 @@
 from sly import Lexer
 import sys
 from decimal import Decimal as dp
-
 # We inherit from Lexer
 # Reserved Keywords based on
 class FortranLexer(Lexer):
@@ -33,33 +32,11 @@ class FortranLexer(Lexer):
     IF :
         IF expr, nl1,nl2,nl3
     '''
-    reserved_words = {'CALL', 'COMMON', 'CONTINUE',           #'CALL_LINK',
-                'DATA', 'DIMMENSION', 'DO', 'DP',
-                'END', 'ELSE', 'EQ', 'EQUIVALENCE',
-                'FALSE', 'FIND', 'FORMAT', 'FUNCTION',
-                'GOTO',
-                'IF', 'INTEGER',
-                'PROGRAM', 'PAUSE',
-                'READ', 'REAL', 'RETURN', 'REWIND',
-                'SUBROUTINE','STOP',
-                'THEN', 'TRUE',
-                'LOGICVALUE', 'LOGICOPERATOR', 'COMPARATOR'
-                }
-
-    others = {'EQ',
-              'GT',
-              'LE',
-              'LT',
-              'GE',
-              'NE'
-              }
-
-    logicaloperator = {'NOT',
-                       'AND',
-                       'OR'
-                       }
-
-    # Set of token names.   This is always required
+    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'FALSE', 'FILE', 'FORMAT', 'FUNCTION','GOTO',
+                    'IF', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     #'FIND', 'ELSE','THEN', 'PROGRAM'
+    others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE','empty'}
+    logicaloperator = {'NOT', 'AND', 'OR','string'}
+    # Set of token names.
     tokens = {
         'ID',
         'PLUS',
@@ -75,34 +52,30 @@ class FortranLexer(Lexer):
         *others,
     }
 
+    # Lines star1ting with C or c will be
     # String containing ignored characters between tokens
     ignore = ' \t\r'
-    # Lines star1ting with C or c will be
-    ignore_comment = r'^[cC]{1}\s[a-zA-Z\d ]*'
     # Set of valid characters
     literals = {'+', '-', '*', '/', '=', '(', ')', '.', ','}
-
     # Regular expression rules for tokens.
     # The idea is to match all the coincidences based on 1130/1800 ibm manual.
-    ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
-    REAL = r'[-+]?(([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+)'
-    INTEGER = r'[+-]?[\d]+'
     #HEXA = r'(0[xX])?[0-9a-fA-F]+'
+    # Ignores
+    #ignore_comment = r'^C.*'
+
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
-    EXPONENT = r'\*\*'
     DIVIDE = r'/'
     ASSIGN = r'='
+    EXPONENT = r'\*\*'
     LPAREN = r'\('
     RPAREN = r'\)'
-
     TRUE = r'\.TRUE\.',
     FALSE = r'\.FALSE\.',
-
-    NOT=r'\.NOT\.'
-    AND=r'\.AND\.'  
-    OR=r'\.OR\.'
+    NOT = r'\.NOT\.'
+    AND = r'\.AND\.'
+    OR = r'\.OR\.'
     EQ = r'\.EQ\.'
     GT = r'\.GT\.'
     LE = r'\.LE\.'
@@ -110,17 +83,24 @@ class FortranLexer(Lexer):
     GE = r'\.GE\.'
     NE = r'\.NE\.'
     DP = r'DOUBLE\sPRECISION'
-
     # Triggered action
     # if the action is triggered you won't need the above expression, or I
     # guess.
-    @_(r'^[cC]{1}\s[a-zA-Z\d ]*')
-    def t_comment(self, t):
+    # Ignore sNew Lines
+    @_(r'CALL')
+    def CALL(self, t):
+        if t.value in self.reserved_words:
+            t.type = t.value.upper()
+        return t 
+    
+    @_(r'(\n[Cc] *.*)| (^[Cc] *.*)')
+    #@_(r"[cC] *.*")
+    def ignore_comment(self, p):
         pass
-    #Ignore New Lines
-    def t_newline(self, t):
-        r'\n+'
-        t.lexer.lineno += len(t.value)
+
+    @_(r"^C[^a-zA-Z0-9_=]{1}.*")
+    def t_comment(self, p):
+        pass
 
     @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
     def ID(self, t):
@@ -128,7 +108,7 @@ class FortranLexer(Lexer):
             t.type = t.value.upper()
         return t
 
-    @_(r'[-+]?(([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+)')
+    @_(r'[-+]?([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+')
     def REAL(self, t):
         t.value = float(t.value)   # Convert to a numeric value
         return t
@@ -138,26 +118,21 @@ class FortranLexer(Lexer):
         t.value = int(t.value)   # Convert to a numeric value
         return t
 
-    '''
-    @_(r'CMPLX\([-+]?(\d|[\d](([\d]*\.?)|([\d]*\.[\d]*))([dD][-+]?[\d]{1,2})|(([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+))\,[-+]?(\d|[\d](([\d]*\.?)|([\d]*\.[\d]*))([dD][-+]?[\d]{1,2})|(([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+))\)')
-    def CMPLX(self, t):
-        t.value = complex(t.value[0], t.value[1]j)
-        return t
-        '''
-    #Sets Dp as double precission instance
-    @_(r"DOUBLE PRECISION")
+    # Sets Dp as double precission instance
+    @_(r"DOUBLE\sPRECISION")
     def DP(self, t):
-        t.value = dp(t.value)
         return t
 
     # Line number tracking
     @_(r'\n+')
     def ignore_newline(self, t):
         self.lineno += t.value.count('\n')
+    
 
-    #Triggers the error 
+
+    # Triggers the error
     def error(self, value):
-        print('Line {}: Bad character {}'.format(self.lineno, value[0])
+        print('Line {}: Bad character {}'.format(self.lineno, value[0]))
         self.index += 1
 
     def test(self, data):
@@ -165,5 +140,5 @@ class FortranLexer(Lexer):
         Unitary test
         """
         for tok in lexer.tokenize(data):
-            print('type={}, value={}'.format(tok.type, tok.value))
+            print('type={} value={}'.format(tok.type, tok.value))
         print("DONE")
