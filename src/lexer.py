@@ -8,16 +8,16 @@ from decimal import Decimal as dp
 # Reserved Keywords based on
 class FortranLexer(Lexer):
     '''
-    Lexical Analyzer for our miniFortranIV(Formula Translation 1130/1800) 
+    Lexical Analyzer for our miniFortranIV(Formula Translation 1130/1800)
     compiler, the elements identified for the Fortran Language in the documents
-    are :  
+    are :
      -constants
      -variables
      -arrays
      -arithmetic operators
      -statements
 
-     Fortran statements are written in a line of width 80 maximun, 
+     Fortran statements are written in a line of width 80 maximun,
      for our Fortran Compiler we use as follow :
         1..5: min range 1, max range 99999
         6:must be zero or blank
@@ -27,13 +27,13 @@ class FortranLexer(Lexer):
     *Comments start with cC.
     REAL: With maximun 15 digits after the period
     GO TO:
-        GO TO Number label: Goto to the line 
-        GO TO (nl1, nl2, nl3), i where i indicate where label to jump. 
+        GO TO Number label: Goto to the line
+        GO TO (nl1, nl2, nl3), i where i indicate where label to jump.
     IF :
         IF expr, nl1,nl2,nl3
     '''
-    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'FALSE', 'FILE', 'FORMAT', 'FUNCTION','GOTO',
-                    'IF', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     #'FIND', 'ELSE','THEN', 'PROGRAM'
+    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'EXIT', 'FALSE', 'FORMAT', 'FUNCTION','GOTO',
+                    'IF', 'INT', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RREAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     # 'FILE','FIND', 'ELSE','THEN', 'PROGRAM'
     others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE','empty'}
     logicaloperator = {'NOT', 'AND', 'OR','string'}
     # Set of token names.
@@ -91,8 +91,8 @@ class FortranLexer(Lexer):
     def CALL(self, t):
         if t.value in self.reserved_words:
             t.type = t.value.upper()
-        return t 
-    
+        return t
+
     @_(r'(\n[Cc] *.*)| (^[Cc] *.*)')
     #@_(r"[cC] *.*")
     def ignore_comment(self, p):
@@ -109,12 +109,12 @@ class FortranLexer(Lexer):
         return t
 
     @_(r'[-+]?([\d]+\.[\d]*|[\d]*\.[\d]+)([eE][-+]?[\d]+)?|[\d]+[eE][-+]?[\d]+')
-    def REAL(self, t):
+    def RREAL(self, t):
         t.value = float(t.value)   # Convert to a numeric value
         return t
 
     @_(r'[+-]?[\d]+')
-    def INTEGER(self, t):
+    def INT(self, t):
         t.value = int(t.value)   # Convert to a numeric value
         return t
 
@@ -127,7 +127,7 @@ class FortranLexer(Lexer):
     @_(r'\n+')
     def ignore_newline(self, t):
         self.lineno += t.value.count('\n')
-    
+
 
 
     # Triggers the error
