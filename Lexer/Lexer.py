@@ -120,7 +120,6 @@ class FortranLexer(Lexer):
     # Sets Dp as double precission instance
     @_(r"DOUBLE\sPRECISION")
     def DP(self, t):
-        t.value = dp(t.value)
         return t
 
     # Line number tracking
@@ -140,12 +139,12 @@ class FortranLexer(Lexer):
         Unitary test
         """
         for tok in lexer.tokenize(data):
-            print('type={} value={}'.format(tok.type, tok.value))
+            print('{}'.format(tok))
         print("DONE")
 
 if __name__ == '__main__':
     # Change this line for your dataset
-    sys.argv.append('datasets/test1')
+    sys.argv.append('datasets/sample1.fiv')
     if len(sys.argv) != 2:
         sys.stderr.write("Usage: %s filename\n" % sys.argv[0])
         raise SystemExit(1)
