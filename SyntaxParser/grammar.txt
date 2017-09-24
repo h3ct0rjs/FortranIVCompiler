@@ -1,7 +1,6 @@
-# Gramatica para FORTRAN IV
+# Grammar FORTRAN IV
 
-program : program statement
-        | statement
+program | statement
         ;
 
 statement : INT command
@@ -15,10 +14,10 @@ command : variable ASSIGN expr
         | DIMMENSION dimmensionOption
         | DO doOption
         | END
-        | FORMAT LPAREN formatOptions RPAREN
+        | FORMAT LPAREN formatOption RPAREN
         | FUNCTION ID LPAREN varlist RPAREN
         | GOTO gotoOption
-        | IF LPAREN relexpr RPAREN INT ',' INT ',' INT
+        | IF LPAREN relexpr RPAREN ifOption
         | INTEGER exprlist
         | PAUSE pauseOption
         | READ readOption
@@ -29,33 +28,19 @@ command : variable ASSIGN expr
         | WRITE LPAREN optionsIO RPAREN varlist
         ;
 
-gotoOption: INT
-        |ID
-        | LPAREN intlist RPAREN ',' variable
+variable: ID LPAREN expr "," expr RPAREN
+        | ID LPAREN expr RPAREN
+        | ID
         ;
 
-doOption: INT variable ASSIGN INT ',' INT ',' INT
-        | INT variable ASSIGN INT ',' INT
+varlist : varlist "," variable
+        | variable
         ;
 
-pauseOption: INT
-        | empty
-        ;
-
-stopOption: INT
-        | empty
-        ;
-
-callOption: ID LPAREN paramlist RPAREN
-        | EXIT callExit
-        ;
-
-callExit: LPAREN INT RPAREN
-        | empty
-        ;
-
-readOption: LPAREN optionsIO RPAREN varlist
-        | LPAREN optionsIO RPAREN
+number  : INT
+        | RREAL
+        | MINUS INT
+        | MINUS RREAL
         ;
 
 expr    : expr PLUS expr
@@ -70,8 +55,7 @@ expr    : expr PLUS expr
         | variable
         ;
 
-
-exprlist: exprlist ',' expr
+exprlist: exprlist "," expr
         | expr
         ;
 
@@ -86,68 +70,87 @@ relexpr : expr LT expr
         | NOT relexpr
         ;
 
-variable: ID LPAREN expr ',' expr RPAREN
-        | ID LPAREN expr RPAREN
+callOption: ID LPAREN idList RPAREN
+        | EXIT callExit
+        ;
+
+callExit: LPAREN INT RPAREN
+        | empty
+        ;
+
+idList  : idList "," ID
         | ID
         ;
 
-varlist : varlist ',' variable
-        | variable
+dataOption: dataOption "," varlist "/" datalist "/"
+        | varlist "/" datalist "/"
         ;
 
-paramlist : ID ',' paramlist
-        | ID
-
-number  : INT
-        | RREAL
-        | MINUS INT
-        | MINUS RREAL
+datalist: datalist "," INT "*" number
+        | datalist "," number
+        | INT "*" number
+        | number
         ;
 
-intlist : intlist ',' INT
+dimmensionOption: dimmensionOption "," ID LPAREN intlist RPAREN
+        | ID LPAREN intlist RPAREN
+        ;
+
+intlist : intlist "," INT
         | INT
         ;
 
-optionsIO: INT ',' INT
-        | INT "'" INT
-        | ID ',' INT
-        | ID "'" INT
-        | INT ',' '*'
-        | INT "'" '*'
+doOption: INT variable ASSIGN INT "," INT "," INT
+        | INT variable ASSIGN INT "," INT
         ;
 
------------------------------------------------------------------
-formatOptions: formatOptions ',' formatOptions
-        | formatOptions '/' formatOptions
-        | LPAREN formatOptions RPAREN
-        | INT conversion
+formatOption: formatOption "," formatOption
+        | formatOption "/" formatOption
+        | INT LPAREN formatOption RPAREN
+        | LPAREN formatOption RPAREN
         | conversion
         | string
         | empty
         ;
 
-conversion: LPAREN conversion RPAREN
-        | conversion ',' typeconversion
-        | typeconversion
-        ;
-
-typeconversion: INT ID
-        | ID INT '.' INT
+conversion: INT ID
+        | ID INT "." INT
         | ID INT
         | ID string
         ;
-------------------------------------------------------------------
 
-dimmensionOption: dimmensionOption ',' ID LPAREN intlist RPAREN
-        | ID LPAREN intlist RPAREN
+string  : STRING
+        | HSTRING
         ;
 
-dataOption: varlist ‘/’ datalist ‘/‘ ‘,’ dataOption
-        | varlist ‘/‘ datalist ‘/‘
+gotoOption: INT
+        | ID
+        | LPAREN intlist RPAREN "," variable
         ;
 
-datalist: datalist ‘,’ INT ‘*’ number
-        | datalist ‘,’ number
-        | INT ‘*’ number
-        | number
+ifOption: ifValue "," ifValue "," ifValue
+        ;
+
+ifValue : INT
+        | ID
+        ;
+
+pauseOption: INT
+        | empty
+        ;
+
+stopOption: INT
+        | empty
+        ;
+
+readOption: LPAREN optionsIO RPAREN varlist
+        | LPAREN optionsIO RPAREN empty
+        ;
+
+optionsIO: INT "," INT
+        | INT "'" INT
+        | ID "," INT
+        | ID "'" INT
+        | INT "," "*"
+        | INT "'" "*"
         ;
