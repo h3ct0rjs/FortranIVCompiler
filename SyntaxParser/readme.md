@@ -1,3 +1,14 @@
+# Syntactical Analyzer 
+
+This is the Syntactical Analyzer for our *mini**Fortran***,we base all our research in the 1330/1800 Ibm Manual, 
+we try to keep this code as simple as possible. 
+
+We use the Sly tutorial in order to implement this code. 
+
+# Grammar: MiniFortran IV
+The following grammar was implemente in our syntax analizer:
+
+```fortran
 # Grammar FORTRAN IV
 
 program | statement
@@ -154,3 +165,11 @@ optionsIO: INT "," INT
         | INT "," "*"
         | INT "'" "*"
         ;
+```
+
+
+
+
+## contact details
+
+*hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co*
