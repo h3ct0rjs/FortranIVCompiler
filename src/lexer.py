@@ -32,13 +32,17 @@ class FortranLexer(Lexer):
     IF :
         IF expr, nl1,nl2,nl3
     '''
-    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'DP', 'END', 'EXIT', 'FALSE', 'FORMAT', 'FUNCTION','GOTO',
-                    'IF', 'INT', 'INTEGER', 'PAUSE', 'READ', 'REAL', 'RREAL', 'RETURN', 'SUBROUTINE', 'STOP', 'TRUE', 'WRITE'}     # 'FILE','FIND', 'ELSE','THEN', 'PROGRAM'
-    others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE','empty'}
-    logicaloperator = {'NOT', 'AND', 'OR','string'}
+    reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'END','EXIT',
+                    'FORMAT', 'FUNCTION','GOTO', 'IF','INT', 'INTEGER', 'PAUSE',
+                    'READ', 'REAL', 'RREAL','RETURN', 'SUBROUTINE', 'STOP', 'WRITE'} 
+                    # DP','FALSE','FILE','FIND', 'ELSE','THEN', 'TRUE', 'PROGRAM'
+    others = {'EQ', 'GT', 'LE', 'LT', 'GE', 'NE'}
+    logicaloperator = {'NOT', 'AND', 'OR'}
     # Set of token names.
     tokens = {
         'ID',
+        'STRING',
+        'HSTRING',
         'PLUS',
         'MINUS',
         'TIMES',
@@ -56,23 +60,23 @@ class FortranLexer(Lexer):
     # String containing ignored characters between tokens
     ignore = ' \t\r'
     # Set of valid characters
-    literals = {'+', '-', '*', '/', '=', '(', ')', '.', ','}
+    literals = {'+', '-', '*', '/', '=', '(', ')', '.', ',', "'"}
     # Regular expression rules for tokens.
     # The idea is to match all the coincidences based on 1130/1800 ibm manual.
     #HEXA = r'(0[xX])?[0-9a-fA-F]+'
     # Ignores
     #ignore_comment = r'^C.*'
 
+    ASSIGN = r'='
     PLUS = r'\+'
     MINUS = r'-'
+    EXPONENT = r'\*\*'
     TIMES = r'\*'
     DIVIDE = r'/'
-    ASSIGN = r'='
-    EXPONENT = r'\*\*'
     LPAREN = r'\('
     RPAREN = r'\)'
-    TRUE = r'\.TRUE\.',
-    FALSE = r'\.FALSE\.',
+    #TRUE = r'\.TRUE\.',
+    #FALSE = r'\.FALSE\.',
     NOT = r'\.NOT\.'
     AND = r'\.AND\.'
     OR = r'\.OR\.'
@@ -82,7 +86,7 @@ class FortranLexer(Lexer):
     LT = r'\.LT\.'
     GE = r'\.GE\.'
     NE = r'\.NE\.'
-    DP = r'DOUBLE\sPRECISION'
+    #DP = r'DOUBLE\sPRECISION'
     # Triggered action
     # if the action is triggered you won't need the above expression, or I
     # guess.
@@ -102,6 +106,18 @@ class FortranLexer(Lexer):
     def t_comment(self, p):
         pass
 
+    @_(r'[\'][^\']*[\']')
+    def STRING(self, t):
+        if t.value in self.tokens:
+            t.type = t.value.upper()
+        return t
+
+    @_(r'[1-9]{1,3}[H]([^),]+)')
+    def HSTRING(self, t):
+        if t.value in self.tokens:
+            t.type = t.value.upper()
+        return t
+
     @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
     def ID(self, t):
         if t.value in self.reserved_words:
@@ -119,9 +135,11 @@ class FortranLexer(Lexer):
         return t
 
     # Sets Dp as double precission instance
+    '''
     @_(r"DOUBLE\sPRECISION")
     def DP(self, t):
         return t
+    '''
 
     # Line number tracking
     @_(r'\n+')
@@ -142,3 +160,16 @@ class FortranLexer(Lexer):
         for tok in lexer.tokenize(data):
             print('type={} value={}'.format(tok.type, tok.value))
         print("DONE")
+
+
+if __name__== '__main__':
+    import sys
+
+    sys.argv.append('../Lexer/datasets/sample1.fiv')
+
+    if len(sys.argv) != 2:
+        sys.stderr.write('usage: {} filename\n'.format(sys.argv[0]))
+        raise SystemExit(1)
+
+    lexer = FortranLexer()
+    lexer.test(open(sys.argv[1]).read())
