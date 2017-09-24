@@ -1,4 +1,4 @@
-# Lexical Analyzer, FortranIV Compiler
+# Parser, FortranIV Compiler
 # Compiler Course, UTP 2017-2
 # hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
 from sly import Parser
@@ -12,17 +12,27 @@ NOTES :
 
 
 class FortranParser(Parser):
-    #debugfile = 'parser.out'  # control de depuración
+
+    debugfile = 'parser.out'  # control de depuración
 
     #def __init__(self):
     #    self.errorStatus = False
     tokens = FortranLexer.tokens
-    #start = 'program'
+    start = 'program'
+
 
     precedence = (
+        ('nonassoc','LT','GT','LE','GE', 'EQ', 'NE'),
         ('left', 'PLUS', 'MINUS'),
         ('left', 'TIMES', 'DIVIDE'),
+        ('left', 'EXPONENT'),
+        ('left', '/', '*'),
+        ('right', 'UMINUS'),
+        ('right', 'UNOT'),
+        ('left', 'AND', 'OR'),
+        ('left', ','),
     )
+
     '''
     See grammar.txt file for more details
     '''
@@ -37,7 +47,7 @@ class FortranParser(Parser):
         pass
 
     '''statement Section'''
-    @_('INTEGER command')
+    @_('INT command')
     def statement(self, p):
         pass
 
@@ -50,27 +60,7 @@ class FortranParser(Parser):
     def command(self, p):
         pass
 
-    @_('GOTO INTEGER')
-    def command(self, p):
-        pass
-
-    @_('GOTO ID')
-    def command(self, p):
-        pass
-
-    @_('GOTO LPAREN intlist RPAREN "," variable')
-    def command(self, p):
-        pass
-
-    @_('IF LPAREN relexpr RPAREN INTEGER "," INTEGER "," INTEGER')
-    def command(self, p):
-        pass
-
-    @_('DO INTEGER variable ASSIGN INTEGER "," INTEGER "," INTEGER')
-    def command(self, p):
-        pass
-
-    @_('DO INTEGER variable ASSIGN INTEGER "," INTEGER')
+    @_('CALL callOption')
     def command(self, p):
         pass
 
@@ -78,71 +68,23 @@ class FortranParser(Parser):
     def command(self, p):
         pass
 
-    @_('PAUSE')
+    @_('DATA dataOption')
+    def command(self, p):
+        pass
+    
+    @_('DIMMENSION dimmensionOption')
     def command(self, p):
         pass
 
-    @_('PAUSE INTEGER')
-    def command(self, p):
-        pass
-
-    @_('STOP')
-    def command(self, p):
-        pass
-
-    @_('STOP INTEGER')
-    def command(self, p):
-        pass
-
-    @_('RETURN')
-    def command(self, p):
+    @_('DO doOption')
+    def command(self,p):
         pass
 
     @_('END')
     def command(self, p):
         pass
 
-    @_('CALL ID LPAREN paramlist RPAREN')
-    def command(self, p):
-        pass
-
-    @_('READ LPAREN optionsIO RPAREN varlist')
-    def command(self, p):
-        pass
-
-    @_('READ LPAREN optionsIO RPAREN')
-    def command(self, p):
-        pass
-
-    @_('WRITE LPAREN optionsIO RPAREN varlist')
-    def command(self, p):
-        pass
-
-    @_('END FILE INTEGER')
-    def command(self, p):
-        pass
-
-    @_('END FILE ID')
-    def command(self, p):
-        pass
-
-    @_('INTEGER FORMAT LPAREN formatOptions RPAREN')
-    def command(self, p):
-        pass
-
-    @_('INTEGER exprlist')
-    def command(self, p):
-        pass
-
-    @_('REAL exprlist')
-    def command(self, p):
-        pass
-
-    @_('DIMMENSION dimmensionOptions')
-    def command(self, p):
-        pass
-
-    @_('DATA dataOptions')
+    @_('FORMAT LPAREN formatOption RPAREN')
     def command(self, p):
         pass
 
@@ -150,8 +92,83 @@ class FortranParser(Parser):
     def command(self, p):
         pass
 
+    @_('GOTO gotoOption')
+    def command(self, p):
+        pass
+
+    @_('IF LPAREN relexpr RPAREN ifOption')
+    def command(self, p):
+        pass
+
+    @_('INTEGER exprlist')
+    def command(self, p):
+        pass
+
+    @_('PAUSE pauseOption')
+    def command(self, p):
+        pass
+
+    @_('REAL exprlist')
+    def command(self, p):
+        pass
+
+    @_('READ readOption')
+    def command(self, p):
+        pass
+
+    @_('RETURN')
+    def command(self, p):
+        pass
+
+    @_('STOP stopOption')
+    def command(self, p):
+        pass
+
     @_('SUBROUTINE ID LPAREN varlist RPAREN')
     def command(self, p):
+        pass
+
+    @_('WRITE LPAREN optionsIO RPAREN varlist')
+    def command(self, p):
+        pass
+
+    ''' variable Section '''
+    @_('ID LPAREN expr "," expr RPAREN')
+    def variable(self, p):
+        pass
+
+    @_('ID LPAREN expr RPAREN')
+    def variable(self, p):
+        pass
+
+    @_('ID')
+    def variable(self, p):
+        pass
+
+    '''  varlist Section '''
+    @_('varlist "," variable')
+    def varlist(self, p):
+        pass
+
+    @_('variable')
+    def varlist(self, p):
+        pass
+
+    '''  number Section  '''
+    @_('INT')
+    def number(self, p):
+        pass
+
+    @_('RREAL')
+    def number(self, p):
+        pass
+
+    @_('MINUS INT %prec UMINUS')
+    def number(self, p):
+        pass
+
+    @_('MINUS RREAL %prec UMINUS')
+    def number(self, p):
         pass
 
     '''expr Section'''
@@ -174,14 +191,8 @@ class FortranParser(Parser):
     @_('expr EXPONENT expr')
     def expr(self, p):
         pass
-
-    '''
-    @_('expr DS  expr')
-    def expr(self, p):
-        pass
-    '''
-
-    @_('MINUS expr')
+    
+    @_('MINUS expr %prec UMINUS')
     def expr(self, p):
         pass
 
@@ -189,11 +200,11 @@ class FortranParser(Parser):
     def expr(self, p):
         pass
 
-    @_('INTEGER')
+    @_('INT')
     def expr(self, p):
         pass
 
-    @_('REAL')
+    @_('RREAL')
     def expr(self, p):
         pass
 
@@ -201,7 +212,7 @@ class FortranParser(Parser):
     def expr(self, p):
         pass
 
-    '''  exprlist Section'''
+    ''' exprlist Section '''
     @_('exprlist "," expr')
     def exprlist(self, p):
         pass
@@ -243,178 +254,48 @@ class FortranParser(Parser):
     def relexpr(self, p):
         pass
 
-    @_('NOT relexpr')
+    @_('NOT relexpr %prec UNOT')
     def relexpr(self, p):
         pass
 
-    '''  variable Section'''
-    @_('ID LPAREN expr "," expr RPAREN')
-    def variable(self, p):
+    ''' callOption Section  '''
+    @_('ID LPAREN idList RPAREN')
+    def callOption(self,p):
         pass
 
-    @_('ID LPAREN expr RPAREN')
-    def variable(self, p):
+    @_('EXIT callExit')
+    def callOption(self,p):
         pass
 
-    @_('ID')
-    def variable(self, p):
-        pass
-
-    '''  varlist Section'''
-    @_(' varlist "," variable')
-    def varlist(self, p):
-        pass
-
-    @_('variable')
-    def varlist(self, p):
-        pass
-
-    '''  paramlist Section'''
-    @_('ID "," paramlist')
-    def paramlist(self, p):
-        pass
-
-    @_('ID')
-    def paramlist(self, p):
-        pass
-
-    '''  number Section'''
-    @_('INTEGER')
-    def number(self, p):
-        pass
-
-    @_('REAL')
-    def number(self, p):
-        pass
-
-    @_('MINUS INTEGER')
-    def number(self, p):
-        pass
-
-    @_('MINUS REAL')
-    def number(self, p):
-        pass
-
-    '''  numlist Section'''
-
-
-    '''  intlist Section'''
-    @_('intlist "," INTEGER')
-    def intlist(self, p):
-        pass
-
-    @_('INTEGER')
-    def intlist(self, p):
-        pass
-
-    '''  optionsIO Section'''
-    @_('INTEGER "," INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('INTEGER "\'" INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('ID "," INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('ID "\'" INTEGER')
-    def optionsIO(self, p):
-        pass
-
-    @_('INTEGER "," "*"')
-    def optionsIO(self, p):
-        pass
-
-    @_('INTEGER "\'" "*"')
-    def optionsIO(self, p):
-        pass
-
-    
-    # revisar
-    ''' formatOptions Section '''
-    @_('formatOptions "," formatOptions')
-    def formatOptions(self, p):
-        pass
-
-    @_('formatOptions "/" formatOptions')
-    def formatOptions(self, p):
-        pass
-
-    @_('LPAREN formatOptions RPAREN')
-    def formatOptions(self, p):
-        pass
-
-    @_('INTEGER conversion')
-    def formatOptions(self, p):
-        pass
-
-    @_('conversion')
-    def formatOptions(self, p):
-        pass
-
-    @_('string')
-    def formatOptions(self, p):
+    ''' callExit Section  '''
+    @_('LPAREN INT RPAREN')
+    def callExit(self,p):
         pass
 
     @_('empty')
-    def formatOptions(self, p):
+    def callExit(self,p):
         pass
 
-    # conversion Section
-    @_('LPAREN conversion RPAREN')
-    def conversion(self, p):
+    '''  idList Section  '''
+    @_('idList "," ID')
+    def idList(self, p):
         pass
 
-    @_('conversion "," typeconversion')
-    def conversion(self, p):
+    @_('ID')
+    def idList(self, p):
         pass
 
-    @_('typeconversion')
-    def conversion(self, p):
-        pass
-
-    # typeconversion Section
-    @_('INTEGER ID')
-    def typeconversion(self, p):
-        pass
-
-    @_('ID INTEGER "." INTEGER')
-    def typeconversion(self, p):
-        pass
-
-    @_('ID INTEGER')
-    def typeconversion(self, p):
-        pass
-
-    @_('ID string')
-    def typeconversion(self, p):
-        pass
-    ''' end formatOptions Section'''
-
-    '''  dimmensionOptions Section'''
-    @_('dimmensionOptions "," ID LPAREN intlist RPAREN')
-    def dimmensionOptions(self, p):
-        pass
-
-    @_('ID LPAREN intlist RPAREN')
-    def dimmensionOptions(self, p):
-        pass
-    
-    '''  dataOptions Section'''
-    @_('varlist "/" datalist "/" "," dataOptions')
-    def dataOptions(self, p):
+    ''' dataOptions Section  '''
+    @_('dataOption "," varlist "/" datalist "/"')
+    def dataOption(self, p):
         pass
 
     @_('varlist "/" datalist "/"')
-    def dataOptions(self, p):
+    def dataOption(self, p):
         pass
-    
-    #revisar
-    '''  datalist Section'''
-    @_('datalist "," INTEGER "*" number')
+
+    '''  datalist Section  '''
+    @_('datalist "," INT "*" number')
     def datalist(self, p):
         pass
 
@@ -422,20 +303,209 @@ class FortranParser(Parser):
     def datalist(self, p):
         pass
 
-    @_('INTEGER "*" number')
+    @_('INT "*" number')
     def datalist(self, p):
         pass
 
     @_('number')
     def datalist(self, p):
         pass
-    '''  datalist Section'''
+
+    '''  dimmensionOption Section  '''
+    @_('dimmensionOption "," ID LPAREN intlist RPAREN')
+    def dimmensionOption(self, p):
+        pass
+
+    @_('ID LPAREN intlist RPAREN')
+    def dimmensionOption(self, p):
+        pass
+
+    '''  intlist Section'''
+    @_('intlist "," INT')
+    def intlist(self, p):
+        pass
+
+    @_('INT')
+    def intlist(self, p):
+        pass
+
+    ''' doOption Section '''
+    @_('INT variable ASSIGN INT "," INT "," INT')
+    def doOption(self, p):
+        pass
+
+    @_('INT variable ASSIGN INT "," INT')
+    def doOption(self, p):
+        pass
+
+    ''' formatOption Section '''
+    @_('formatOption "," formatOption')
+    def formatOption(self, p):
+        pass
+
+    @_('formatOption "/" formatOption')
+    def formatOption(self, p):
+        pass
+
+    @_('INT LPAREN formatOption RPAREN')
+    def formatOption(self, p):
+        pass
+
+    @_('LPAREN formatOption RPAREN')
+    def formatOption(self, p):
+        pass
+
+    @_('conversion')
+    def formatOption(self, p):
+        pass
+
+    @_('string')
+    def formatOption(self, p):
+        pass
+
+    @_('empty')
+    def formatOption(self, p):
+        pass
+
+    ''' conversion Section '''
+    @_('INT ID')
+    def conversion(self, p):
+        pass
+
+    @_('ID INT "." INT')
+    def conversion(self, p):
+        pass
+
+    @_('ID INT')
+    def conversion(self, p):
+        pass
+
+    @_('ID string')
+    def conversion(self, p):
+        pass
+    
+    ''' string Section '''
+    @_('STRING')
+    def string(self, p):
+        pass
+
+    @_('HSTRING')
+    def string(self, p):
+        pass
+
+    ''' gotoOption Section '''
+    @_('INT')
+    def gotoOption(self, p):
+        pass
+
+    @_('ID')
+    def gotoOption(self, p):
+        pass
+
+    @_('LPAREN intlist RPAREN "," variable')
+    def gotoOption(self, p):
+        pass
+
+    ''' ifOption Section '''
+    @_('ifValue "," ifValue "," ifValue')
+    def ifOption(self, p):
+        pass
+
+    @_('INT')
+    def ifValue(self, p):
+        pass
+
+    @_('ID')
+    def ifValue(self, p):
+        pass
+
+    ''' pauseOption Section'''
+    @_('INT')
+    def pauseOption(self, p):
+        pass
+
+    @_('empty') # error shift/reduce
+    def pauseOption(self, p):
+        pass
+    
+    ''' stopOption Section '''
+    @_('INT')
+    def stopOption(self, p):
+        pass
+
+    
+    @_('empty') # error shift/reduce
+    def stopOption(self, p):
+        pass
+
+    ''' readOption Section '''
+    @_('LPAREN optionsIO RPAREN varlist')
+    def readOption(self, p):
+        pass
+    
+    @_('LPAREN optionsIO RPAREN empty') # error shift/reduce
+    def readOption(self, p):
+        pass
+
+    '''  optionsIO Section'''
+    @_('INT "," INT')
+    def optionsIO(self, p):
+        pass
+
+    @_('INT "\'" INT')
+    def optionsIO(self, p):
+        pass
+
+    @_('ID "," INT')
+    def optionsIO(self, p):
+        pass
+
+    @_('ID "\'" INT')
+    def optionsIO(self, p):
+        pass
+
+    @_('INT "," "*"')
+    def optionsIO(self, p):
+        pass
+
+    @_('INT "\'" "*"')
+    def optionsIO(self, p):
+        pass
+
+    @_('') #empty
+    def empty(self, p):
+        pass
+
 
     def error(self, p):
-        '''
+        
         #Trigger the  error if there is 
-        '''
+        
         print("There was an Error Reading the Grammar!.")
         if not p:
             print("End of File!")
             return
+
+            
+if __name__ == '__main__':
+    #import sys
+
+    lexer = FortranLexer()
+    parser = FortranParser()
+
+    sys.argv.append('../Lexer/datasets/sample1.fiv')
+
+    if len(sys.argv) != 2:
+        sys.stderr.write('usage: {} filename\n'.format(sys.argv[0]))
+        raise SystemExit(1)
+
+    file = open(sys.argv[1]).read()
+
+    #lexer.test(file)
+
+    while True:
+        try:
+            result = parser.parse(lexer.tokenize(file))
+            print(result)
+        except EOFError:
+            break
