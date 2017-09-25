@@ -36,8 +36,7 @@ Token(type='ASSIGN', value='=', lineno=9, index=184
 Token(type='ID', value='N', lineno=9, index=185
 Token(type='MINUS', value='-', lineno=9, index=186
 Token(type='INT', value=1, lineno=9, index=187
-Token(type='ID', value='GO', lineno=10, index=196
-Token(type='ID', value='TO', lineno=10, index=199
+Token(type='GOTO', value='GO TO', lineno=10, index=196
 Token(type='INT', value=500, lineno=10, index=202
 Token(type='INT', value=1000, lineno=11, index=208
 Token(type='WRITE', value='WRITE', lineno=11, index=213

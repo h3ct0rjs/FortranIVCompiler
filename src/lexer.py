@@ -3,7 +3,7 @@
 # hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
 from sly import Lexer
 from decimal import Decimal as dp
-
+from util import *
 
 class FortranLexer(Lexer):
     reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'END', 'EXIT',
@@ -45,8 +45,6 @@ class FortranLexer(Lexer):
     DIVIDE = r'/'
     LPAREN = r'\('
     RPAREN = r'\)'
-    #TRUE = r'\.TRUE\.',
-    #FALSE = r'\.FALSE\.',
     NOT = r'\.NOT\.'
     AND = r'\.AND\.'
     OR = r'\.OR\.'
@@ -56,7 +54,7 @@ class FortranLexer(Lexer):
     LT = r'\.LT\.'
     GE = r'\.GE\.'
     NE = r'\.NE\.'
-    #DP = r'DOUBLE\sPRECISION'
+
 
     # Triggered actions, First when tokenizer finds a word matching rule
     @_(r'CALL')
@@ -64,7 +62,8 @@ class FortranLexer(Lexer):
         if t.value in self.reserved_words:
             t.type = t.value.upper()
         return t
-    #ignore comments 
+    # ignore comments
+
     @_(r'(\n[Cc] *.*)| (^[Cc] *.*)')
     def ignore_comment(self, p):
         pass
@@ -84,7 +83,11 @@ class FortranLexer(Lexer):
         if t.value in self.tokens:
             t.type = t.value.upper()
         return t
-
+    @_(r'(GOTO|GO\sTO)')
+    def GOTO(self, t):
+        if t.value in self.reserved_words:
+            t.type = t.value.upper()
+        return t
     @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
     def ID(self, t):
         if t.value in self.reserved_words:
@@ -100,13 +103,7 @@ class FortranLexer(Lexer):
     def INT(self, t):
         t.value = int(t.value)   # Convert to a numeric value
         return t
-
-    # Sets Dp as double precission instance
-    '''
-    @_(r"DOUBLE\sPRECISION")
-    def DP(self, t):
-        return t
-    '''
+    
 
     # Line number tracking
     @_(r'\n+')
@@ -115,5 +112,5 @@ class FortranLexer(Lexer):
 
     # Triggers the error
     def error(self, value):
-        print('Line {}: Bad character {}'.format(self.lineno, value[0]))
+        print('{} Line {}: Bad character {}'.format(warning, self.lineno, value[0]))
         self.index += 1

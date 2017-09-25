@@ -5,18 +5,18 @@ Rule 1     program -> statement
 Rule 2     program -> program statement
 Rule 3     statement -> command
 Rule 4     statement -> INT command
-Rule 5     command -> WRITE LPAREN optionsIO RPAREN varlist
-Rule 6     command -> SUBROUTINE ID LPAREN varlist RPAREN
+Rule 5     command -> WRITE LPAREN optionsIO RPAREN varlist  [precedence=left, level=10]
+Rule 6     command -> SUBROUTINE ID LPAREN varlist RPAREN  [precedence=left, level=10]
 Rule 7     command -> STOP stopOption
 Rule 8     command -> RETURN
 Rule 9     command -> READ readOption
 Rule 10    command -> REAL exprlist
 Rule 11    command -> PAUSE pauseOption
 Rule 12    command -> INTEGER exprlist
-Rule 13    command -> IF LPAREN relexpr RPAREN ifOption
+Rule 13    command -> IF LPAREN relexpr RPAREN ifOption  [precedence=left, level=10]
 Rule 14    command -> GOTO gotoOption
-Rule 15    command -> FUNCTION ID LPAREN varlist RPAREN
-Rule 16    command -> FORMAT LPAREN formatOption RPAREN
+Rule 15    command -> FUNCTION ID LPAREN varlist RPAREN  [precedence=left, level=10]
+Rule 16    command -> FORMAT LPAREN formatOption RPAREN  [precedence=left, level=10]
 Rule 17    command -> END
 Rule 18    command -> DO doOption
 Rule 19    command -> DIMMENSION dimmensionOption
@@ -25,8 +25,8 @@ Rule 21    command -> CONTINUE
 Rule 22    command -> CALL callOption
 Rule 23    command -> variable ASSIGN expr
 Rule 24    variable -> ID
-Rule 25    variable -> ID LPAREN expr RPAREN
-Rule 26    variable -> ID LPAREN expr , expr RPAREN
+Rule 25    variable -> ID LPAREN expr RPAREN  [precedence=left, level=10]
+Rule 26    variable -> ID LPAREN expr , expr RPAREN  [precedence=left, level=10]
 Rule 27    varlist -> variable
 Rule 28    varlist -> varlist , variable  [precedence=left, level=9]
 Rule 29    number -> MINUS RREAL  [precedence=right, level=6]
@@ -36,7 +36,7 @@ Rule 32    number -> INT
 Rule 33    expr -> variable
 Rule 34    expr -> RREAL
 Rule 35    expr -> INT
-Rule 36    expr -> LPAREN expr RPAREN
+Rule 36    expr -> LPAREN expr RPAREN  [precedence=left, level=10]
 Rule 37    expr -> MINUS expr  [precedence=right, level=6]
 Rule 38    expr -> expr EXPONENT expr  [precedence=left, level=4]
 Rule 39    expr -> expr DIVIDE expr  [precedence=left, level=3]
@@ -55,9 +55,9 @@ Rule 51    relexpr -> expr GT expr  [precedence=nonassoc, level=1]
 Rule 52    relexpr -> expr LE expr  [precedence=nonassoc, level=1]
 Rule 53    relexpr -> expr LT expr  [precedence=nonassoc, level=1]
 Rule 54    callOption -> EXIT callExit
-Rule 55    callOption -> ID LPAREN idList RPAREN
+Rule 55    callOption -> ID LPAREN idList RPAREN  [precedence=left, level=10]
 Rule 56    callExit -> empty
-Rule 57    callExit -> LPAREN INT RPAREN
+Rule 57    callExit -> LPAREN INT RPAREN  [precedence=left, level=10]
 Rule 58    idList -> ID
 Rule 59    idList -> idList , ID
 Rule 60    dataOption -> varlist / datalist /  [precedence=left, level=5]
@@ -66,8 +66,8 @@ Rule 62    datalist -> number
 Rule 63    datalist -> INT * number  [precedence=left, level=5]
 Rule 64    datalist -> datalist , number  [precedence=left, level=9]
 Rule 65    datalist -> datalist , INT * number  [precedence=left, level=5]
-Rule 66    dimmensionOption -> ID LPAREN intlist RPAREN
-Rule 67    dimmensionOption -> dimmensionOption , ID LPAREN intlist RPAREN
+Rule 66    dimmensionOption -> ID LPAREN intlist RPAREN  [precedence=left, level=10]
+Rule 67    dimmensionOption -> dimmensionOption , ID LPAREN intlist RPAREN  [precedence=left, level=10]
 Rule 68    intlist -> INT
 Rule 69    intlist -> intlist , INT
 Rule 70    doOption -> INT variable ASSIGN INT , INT
@@ -75,8 +75,8 @@ Rule 71    doOption -> INT variable ASSIGN INT , INT , INT
 Rule 72    formatOption -> empty
 Rule 73    formatOption -> string
 Rule 74    formatOption -> conversion
-Rule 75    formatOption -> LPAREN formatOption RPAREN
-Rule 76    formatOption -> INT LPAREN formatOption RPAREN
+Rule 75    formatOption -> LPAREN formatOption RPAREN  [precedence=left, level=10]
+Rule 76    formatOption -> INT LPAREN formatOption RPAREN  [precedence=left, level=10]
 Rule 77    formatOption -> formatOption / formatOption  [precedence=left, level=5]
 Rule 78    formatOption -> formatOption , formatOption  [precedence=left, level=9]
 Rule 79    conversion -> ID string
@@ -95,8 +95,8 @@ Rule 91    pauseOption -> empty
 Rule 92    pauseOption -> INT
 Rule 93    stopOption -> empty
 Rule 94    stopOption -> INT
-Rule 95    readOption -> LPAREN optionsIO RPAREN empty
-Rule 96    readOption -> LPAREN optionsIO RPAREN varlist
+Rule 95    readOption -> LPAREN optionsIO RPAREN empty  [precedence=left, level=10]
+Rule 96    readOption -> LPAREN optionsIO RPAREN varlist  [precedence=left, level=10]
 Rule 97    optionsIO -> INT ' *  [precedence=left, level=5]
 Rule 98    optionsIO -> INT , *  [precedence=left, level=5]
 Rule 99    optionsIO -> ID ' INT

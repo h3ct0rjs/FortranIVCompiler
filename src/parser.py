@@ -4,17 +4,18 @@
 '''
 from sly import Parser
 from lexer import *
+from util import *
 import sys
 import os.path
 
+
 class FortranParser(Parser):
     # Depuracion
-    debugfile = '../debug/lastparser.out'  
-
+    debugfile = '../debug/Parser.out'
     # def __init__(self):
     #    self.errorStatus = False
     tokens = FortranLexer.tokens
-    start = 'program'   #start symbol
+    start = 'program'  # start symbol
 
     precedence = (
         ('nonassoc', 'LT', 'GT', 'LE', 'GE', 'EQ', 'NE'),
@@ -26,6 +27,7 @@ class FortranParser(Parser):
         ('right', 'UNOT'),
         ('left', 'AND', 'OR'),
         ('left', ','),
+        ('left', 'RPAREN'),
     )
 
     '''
@@ -473,31 +475,19 @@ class FortranParser(Parser):
     def error(self, p):
         # Trigger the  error if there is
         print("There was an Error Reading the Grammar!.")
+        print("{}info>> {}{}".format(yellow,p,reset))
         if not p:
-            print("End of File!")
+            print("{} End of File!".format(warning))
             return
 
-'''            
-if __name__ == '__main__':
-    #import sys
-
-    lexer = FortranLexer()
-    parser = FortranParser()
-
-    sys.argv.append('../Lexer/datasets/sample1.fiv')
-
-    if len(sys.argv) != 2:
-        sys.stderr.write('usage: {} filename\n'.format(sys.argv[0]))
-        raise SystemExit(1)
-
-    file = open(sys.argv[1]).read()
-
-    #lexer.test(file)
-
-    while True:
-        try:
-            result = parser.parse(lexer.tokenize(file))
-            print(result)
-        except EOFError:
-            break
-'''
+        '''while True:
+            tok = next(self.tokens, None)
+            if not tok or tok.type == 'RPAREN':
+                break
+            self.restart()
+        elif p:
+            print("{}Syntax error at token {}".format(warning, p.type))
+            # Just discard the token and tell the parser it's okay.
+            tok = next(self.tokens, None)
+        else:
+            print("{}Syntax error at EOF".format(warning))'''
