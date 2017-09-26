@@ -3,8 +3,7 @@
 # hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
 from sly import Lexer
 from decimal import Decimal as dp
-from util import *
-
+import util
 class FortranLexer(Lexer):
     reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'END', 'EXIT',
                       'FORMAT', 'FUNCTION', 'GOTO', 'IF', 'INT', 'INTEGER', 'PAUSE',
@@ -15,8 +14,8 @@ class FortranLexer(Lexer):
     # Set of token names.
     tokens = {
         'ID',
-        'STRING',
-        'HSTRING',
+        #'STRING',
+        #'HSTRING',
         'PLUS',
         'MINUS',
         'TIMES',
@@ -72,6 +71,14 @@ class FortranLexer(Lexer):
     def t_comment(self, p):
         pass
 
+    
+    @_(r'FORMAT(\s)?\(.*\)')
+    def FORMAT(self, t):
+        if t.value in self.reserved_words:
+            t.type = t.value.upper()
+        return t
+    
+    '''
     @_(r'[\'][^\']*[\']')
     def STRING(self, t):
         if t.value in self.tokens:
@@ -83,6 +90,7 @@ class FortranLexer(Lexer):
         if t.value in self.tokens:
             t.type = t.value.upper()
         return t
+    '''   
     @_(r'(GOTO|GO\sTO)')
     def GOTO(self, t):
         if t.value in self.reserved_words:

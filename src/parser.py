@@ -27,7 +27,7 @@ class FortranParser(Parser):
         ('right', 'UNOT'),
         ('left', 'AND', 'OR'),
         ('left', ','),
-        ('left', 'RPAREN'),
+        #('left', 'RPAREN'),
     )
 
     '''
@@ -81,7 +81,7 @@ class FortranParser(Parser):
     def command(self, p):
         pass
 
-    @_('FORMAT LPAREN formatOption RPAREN')
+    @_('FORMAT')
     def command(self, p):
         pass
 
@@ -125,7 +125,7 @@ class FortranParser(Parser):
     def command(self, p):
         pass
 
-    @_('WRITE LPAREN optionsIO RPAREN varlist')
+    @_('WRITE writeOption')
     def command(self, p):
         pass
 
@@ -255,6 +255,10 @@ class FortranParser(Parser):
     def relexpr(self, p):
         pass
 
+    @_('expr')
+    def relexpr(self, p):
+        pass
+
     ''' callOption Section  '''
     @_('ID LPAREN idList RPAREN')
     def callOption(self, p):
@@ -335,7 +339,7 @@ class FortranParser(Parser):
     def doOption(self, p):
         pass
 
-    ''' formatOption Section '''
+    ''' formatOption Section 
     @_('formatOption "," formatOption')
     def formatOption(self, p):
         pass
@@ -363,8 +367,8 @@ class FortranParser(Parser):
     @_('empty')
     def formatOption(self, p):
         pass
-
-    ''' conversion Section '''
+    '''
+    ''' conversion Section
     @_('INT ID')
     def conversion(self, p):
         pass
@@ -377,11 +381,11 @@ class FortranParser(Parser):
     def conversion(self, p):
         pass
 
-    @_('ID string')
+    @_('ID z')
     def conversion(self, p):
         pass
-
-    ''' string Section '''
+    '''
+    ''' string Section 
     @_('STRING')
     def string(self, p):
         pass
@@ -389,6 +393,7 @@ class FortranParser(Parser):
     @_('HSTRING')
     def string(self, p):
         pass
+    '''
 
     ''' gotoOption Section '''
     @_('INT')
@@ -435,12 +440,22 @@ class FortranParser(Parser):
         pass
 
     ''' readOption Section '''
-    @_('LPAREN optionsIO RPAREN varlist')
+    @_('LPAREN optionsIO RPAREN idEmpty') # error shift/reduce
     def readOption(self, p):
         pass
 
-    @_('LPAREN optionsIO RPAREN empty')  # error shift/reduce
-    def readOption(self, p):
+    ''' writeOption Section '''
+    @_('LPAREN optionsIO RPAREN idEmpty')  # error shift/reduce
+    def writeOption(self, p):
+        pass
+
+    ''' idEmpty  '''
+    @_('idList')
+    def idEmpty(self, p):
+        pass
+
+    @_('empty')
+    def idEmpty(self, p):
         pass
 
     '''  optionsIO Section'''
@@ -448,23 +463,15 @@ class FortranParser(Parser):
     def optionsIO(self, p):
         pass
 
-    @_('INT "\'" INT')
-    def optionsIO(self, p):
-        pass
-
     @_('ID "," INT')
     def optionsIO(self, p):
         pass
 
-    @_('ID "\'" INT')
+    @_('INT')
     def optionsIO(self, p):
         pass
 
-    @_('INT "," "*"')
-    def optionsIO(self, p):
-        pass
-
-    @_('INT "\'" "*"')
+    @_('ID')
     def optionsIO(self, p):
         pass
 
