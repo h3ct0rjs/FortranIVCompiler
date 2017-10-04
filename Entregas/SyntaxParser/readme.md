@@ -1,0 +1,175 @@
+# Syntactical Analyzer 
+
+This is the Syntactical Analyzer for our *mini**Fortran***,we base all our research in the 1330/1800 Ibm Manual, 
+we try to keep this code as simple as possible. 
+
+We use the Sly tutorial in order to implement this code. 
+
+# Grammar: MiniFortran IV
+The following grammar was implemente in our syntax analizer:
+
+```fortran
+# Grammar FORTRAN IV
+
+program | statement
+        ;
+
+statement : INT command
+        | command
+        ;
+
+command : variable ASSIGN expr
+        | CALL callOption
+        | CONTINUE
+        | DATA dataOption
+        | DIMMENSION dimmensionOption
+        | DO doOption
+        | END
+        | FORMAT LPAREN formatOption RPAREN
+        | FUNCTION ID LPAREN varlist RPAREN
+        | GOTO gotoOption
+        | IF LPAREN relexpr RPAREN ifOption
+        | INTEGER exprlist
+        | PAUSE pauseOption
+        | READ readOption
+        | REAL exprlist
+        | RETURN
+        | SUBROUTINE ID LPAREN varlist RPAREN
+        | STOP stopOption
+        | WRITE LPAREN optionsIO RPAREN varlist
+        ;
+
+variable: ID LPAREN expr "," expr RPAREN
+        | ID LPAREN expr RPAREN
+        | ID
+        ;
+
+varlist : varlist "," variable
+        | variable
+        ;
+
+number  : INT
+        | RREAL
+        | MINUS INT
+        | MINUS RREAL
+        ;
+
+expr    : expr PLUS expr
+        | expr MINUS expr
+        | expr TIMES expr
+        | expr DIVIDE expr
+        | expr EXPONENT expr
+        | MINUS expr
+        | LPAREN expr RPAREN
+        | INT
+        | RREAL
+        | variable
+        ;
+
+exprlist: exprlist "," expr
+        | expr
+        ;
+
+relexpr : expr LT expr
+        | expr LE expr
+        | expr GT expr
+        | expr GE expr
+        | expr EQ expr
+        | expr NE expr
+        | relexpr AND relexpr
+        | relexpr OR  relexpr
+        | NOT relexpr
+        ;
+
+callOption: ID LPAREN idList RPAREN
+        | EXIT callExit
+        ;
+
+callExit: LPAREN INT RPAREN
+        | empty
+        ;
+
+idList  : idList "," ID
+        | ID
+        ;
+
+dataOption: dataOption "," varlist "/" datalist "/"
+        | varlist "/" datalist "/"
+        ;
+
+datalist: datalist "," INT "*" number
+        | datalist "," number
+        | INT "*" number
+        | number
+        ;
+
+dimmensionOption: dimmensionOption "," ID LPAREN intlist RPAREN
+        | ID LPAREN intlist RPAREN
+        ;
+
+intlist : intlist "," INT
+        | INT
+        ;
+
+doOption: INT variable ASSIGN INT "," INT "," INT
+        | INT variable ASSIGN INT "," INT
+        ;
+
+formatOption: formatOption "," formatOption
+        | formatOption "/" formatOption
+        | INT LPAREN formatOption RPAREN
+        | LPAREN formatOption RPAREN
+        | conversion
+        | string
+        | empty
+        ;
+
+conversion: INT ID
+        | ID INT "." INT
+        | ID INT
+        | ID string
+        ;
+
+string  : STRING
+        | HSTRING
+        ;
+
+gotoOption: INT
+        | ID
+        | LPAREN intlist RPAREN "," variable
+        ;
+
+ifOption: ifValue "," ifValue "," ifValue
+        ;
+
+ifValue : INT
+        | ID
+        ;
+
+pauseOption: INT
+        | empty
+        ;
+
+stopOption: INT
+        | empty
+        ;
+
+readOption: LPAREN optionsIO RPAREN varlist
+        | LPAREN optionsIO RPAREN empty
+        ;
+
+optionsIO: INT "," INT
+        | INT "'" INT
+        | ID "," INT
+        | ID "'" INT
+        | INT "," "*"
+        | INT "'" "*"
+        ;
+```
+
+
+
+
+## contact details
+
+*hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co*
