@@ -5,12 +5,14 @@
 from sly import Parser
 from lexer import *
 from util import *
+from astfortran import *
 import sys
 import os.path
 
 
 class FortranParser(Parser):
     # Depuracion
+
     debugfile = '../debug/Parser.out'
     # def __init__(self):
     #    self.errorStatus = False
@@ -33,311 +35,302 @@ class FortranParser(Parser):
     '''
     See ../SyntaxParser/grammar.txt file for more details
     '''
+    """
+    @validate_fields(statements=list)
+    class Program(ATS)
+        _fields['statements']
+        def append(self, statement):
+            self.statements.append(statement)
 
+    """
     '''program Section'''
     @_('program statement')
     def program(self, p):
-        pass
+        p[0].append(p[1])
+        return p[0]
 
     @_('statement')
     def program(self, p):
-        pass
+        return Program([p[0]])
 
     '''statement Section'''
     @_('INT command')
     def statement(self, p):
-        pass
+        return Statement(p[0], p[1])
 
     @_('command')
     def statement(self, p):
-        pass
+        return Statement(None, p[0])
 
     '''command Section'''
     @_('variable ASSIGN expr')
     def command(self, p):
-        pass
+        return Assign(p[0], p[2])
 
     @_('CALL callOption')
     def command(self, p):
-        pass
+        return CommandCall(p[0])
 
     @_('CONTINUE')
     def command(self, p):
-        pass
+        return p[0]
 
     @_('DATA dataOption')
     def command(self, p):
-        pass
+        return CommandData(p[1])
 
     @_('DIMMENSION dimmensionOption')
     def command(self, p):
-        pass
+        return CommandDimmension(p[1])
 
     @_('DO doOption')
     def command(self, p):
-        pass
+        return CommandDo(p[1])
 
     @_('END')
     def command(self, p):
-        pass
+        return p[0]
 
     @_('FORMAT')
     def command(self, p):
-        pass
+        return p[0]
 
     @_('FUNCTION ID LPAREN varlist RPAREN')
     def command(self, p):
-        pass
+        return CommandFunction(p[1], p[3])
 
     @_('GOTO gotoOption')
     def command(self, p):
-        pass
+        return CommandGoTo(p[1])
 
     @_('IF LPAREN relexpr RPAREN ifOption')
     def command(self, p):
-        pass
+        return CommandIf(p[2], p[4])
 
     @_('INTEGER exprlist')
     def command(self, p):
-        pass
+        return CommandInteger(p[1])
 
     @_('PAUSE pauseOption')
     def command(self, p):
-        pass
+        return CommandPause(p[1])
 
     @_('REAL exprlist')
     def command(self, p):
-        pass
+        return CommandReal(p[1])
 
     @_('READ readOption')
     def command(self, p):
-        pass
+        return CommandRead(p[1])
 
     @_('RETURN')
     def command(self, p):
-        pass
+        return p[0]
 
     @_('STOP stopOption')
     def command(self, p):
-        pass
+        return CommandStop(p[1])
 
     @_('SUBROUTINE ID LPAREN varlist RPAREN')
     def command(self, p):
-        pass
+        return CommandSubroutine(p[1], p[3])
 
     @_('WRITE writeOption')
     def command(self, p):
-        pass
+        return CommandWrite(p[1])
 
+    """
+    class Idexpresiob(AST):
+        _fields=['ID', 'expr', 'expr']
+    """
     ''' variable Section '''
     @_('ID LPAREN expr "," expr RPAREN')
     def variable(self, p):
-        pass
+        return Variable(p[0], p[1], p[4])
 
     @_('ID LPAREN expr RPAREN')
     def variable(self, p):
-        pass
+        return Variable(p[0], p[1], None)
 
     @_('ID')
     def variable(self, p):
-        pass
+        return Variable(p[0], None, None)
 
     '''  varlist Section '''
     @_('varlist "," variable')
     def varlist(self, p):
-        pass
+        p[0].append(p[2])
+        return p[0]
 
     @_('variable')
     def varlist(self, p):
-        pass
+        return Varlist([p[0]])
 
     '''  number Section  '''
     @_('INT')
     def number(self, p):
-        pass
+        return Number(None, p[0], None)
 
     @_('RREAL')
     def number(self, p):
-        pass
+        return Number(None, None, p[0])
 
     @_('MINUS INT %prec UMINUS')
     def number(self, p):
-        pass
+        return Number(p[0], p[1], None)
 
     @_('MINUS RREAL %prec UMINUS')
     def number(self, p):
-        pass
+        return Number(p[0], None, p[1])
 
     '''expr Section'''
-    @_('expr PLUS expr')
+    @_('expr PLUS expr',
+       'expr MINUS expr',
+       'expr TIMES expr',
+       'expr DIVIDE expr',
+       'expr EXPONENT expr')
     def expr(self, p):
-        pass
-
-    @_('expr MINUS expr')
-    def expr(self, p):
-        pass
-
-    @_('expr TIMES expr')
-    def expr(self, p):
-        pass
-
-    @_('expr DIVIDE expr')
-    def expr(self, p):
-        pass
-
-    @_('expr EXPONENT expr')
-    def expr(self, p):
-        pass
+        return Expr(p[0], p[1], p[2])
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        pass
+        return ExprMinus(p[0], p[1])
 
     @_('LPAREN expr RPAREN')
     def expr(self, p):
-        pass
+        return ExprParen(p[1])
 
     @_('INT')
     def expr(self, p):
-        pass
+        return ExprSingle(p[0], None, None)
 
     @_('RREAL')
     def expr(self, p):
-        pass
+        return ExprSingle(None, p[0], None)
 
     @_('variable')
     def expr(self, p):
-        pass
+        return ExprSingle(None, None, p[0])
 
     ''' exprlist Section '''
     @_('exprlist "," expr')
     def exprlist(self, p):
-        pass
+        p[0].append(p[2])
+        return p[0]
 
     @_('expr')
     def exprlist(self, p):
-        pass
+        return ExprList([p[0]])
 
     '''  relexpr Section'''
-    @_('expr LT expr')
+    @_('expr LT expr',
+        'expr LE expr',
+        'expr GT expr',
+        'expr GE expr',
+        'expr EQ expr',
+        'expr NE expr'
+       )
     def relexpr(self, p):
-        pass
+        return RelExpr(p[0], p[1], p[2])
 
-    @_('expr LE expr')
+    @_('relexpr AND relexpr',
+        'relexpr OR  relexpr')
     def relexpr(self, p):
-        pass
-
-    @_('expr GT expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr GE expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr EQ expr')
-    def relexpr(self, p):
-        pass
-
-    @_('expr NE expr')
-    def relexpr(self, p):
-        pass
-
-    @_('relexpr AND relexpr')
-    def relexpr(self, p):
-        pass
-
-    @_('relexpr OR  relexpr')
-    def relexpr(self, p):
-        pass
+        return LogicaRelExpr(p[0], p[1], p[2])
 
     @_('NOT relexpr %prec UNOT')
     def relexpr(self, p):
-        pass
+        return NotRelExpr(p[0], p[1], p[2])
 
     @_('expr')
     def relexpr(self, p):
-        pass
+        return RelexprSingle(p[0])
 
     ''' callOption Section  '''
     @_('ID LPAREN idList RPAREN')
     def callOption(self, p):
-        pass
+        return CallOption(p[0], p[2])
 
     @_('EXIT callExit')
     def callOption(self, p):
-        pass
+        return CallOption(p[1])
 
     ''' callExit Section  '''
     @_('LPAREN INT RPAREN')
     def callExit(self, p):
-        pass
+        return CallOptionExit(p[1])
 
     @_('empty')
     def callExit(self, p):
-        pass
+        return None
 
     '''  idList Section  '''
     @_('idList "," ID')
     def idList(self, p):
-        pass
+        p[0].append(p[2])
+
+        return IdList(p[0])
 
     @_('ID')
     def idList(self, p):
-        pass
+        return IdList([p[0]])
 
     ''' dataOptions Section  '''
     @_('dataOption "," varlist "/" datalist "/"')
     def dataOption(self, p):
-        pass
+        p[0].append(p[2], p[4])
+        return p[0]
 
     @_('varlist "/" datalist "/"')
     def dataOption(self, p):
-        pass
+        return DataOption([p[0]], [p[2]])
 
-    '''  datalist Section  '''
+    ''' ***datalist Section***  '''
     @_('datalist "," INT "*" number')
     def datalist(self, p):
-        pass
+        p[0].append(p[2], p[4])
+        return p[0]
 
     @_('datalist "," number')
     def datalist(self, p):
-        pass
+        p[0].append(None, p[2])
+        return p[0]
 
     @_('INT "*" number')
     def datalist(self, p):
-        pass
+        return DataList([p[0]], [p[2]])
 
     @_('number')
     def datalist(self, p):
-        pass
+        return DataList([None], [p[0]])
 
     '''  dimmensionOption Section  '''
     @_('dimmensionOption "," ID LPAREN intlist RPAREN')
     def dimmensionOption(self, p):
-        pass
+        p[0].append(p[2], p[5])
 
     @_('ID LPAREN intlist RPAREN')
     def dimmensionOption(self, p):
-        pass
+        return DimmensionOption([p[0]], [p[2]])
 
     '''  intlist Section'''
     @_('intlist "," INT')
     def intlist(self, p):
-        pass
+        p[0].append(p[1])
+        return p[0]
 
     @_('INT')
     def intlist(self, p):
-        pass
+        return Intlist([p[0]])
 
     ''' doOption Section '''
     @_('INT variable ASSIGN INT "," INT "," INT')
     def doOption(self, p):
-        pass
+        return DoOption(p[0], p[1], p[3], p[5], p[7])
 
     @_('INT variable ASSIGN INT "," INT')
     def doOption(self, p):
-        pass
+        return DoOption(p[0], p[1], p[3], p[5], None)
 
     ''' formatOption Section 
     @_('formatOption "," formatOption')
@@ -398,82 +391,77 @@ class FortranParser(Parser):
     ''' gotoOption Section '''
     @_('INT')
     def gotoOption(self, p):
-        pass
-
-    @_('ID')
-    def gotoOption(self, p):
-        pass
+        return GotoOptionInt(p[0])
 
     @_('LPAREN intlist RPAREN "," variable')
     def gotoOption(self, p):
-        pass
+        return GotoOptionIntList(p[1], p[4])
 
     ''' ifOption Section '''
     @_('ifValue "," ifValue "," ifValue')
     def ifOption(self, p):
-        pass
+        return IfOption(p[0], p[2], p[4])
 
     @_('INT')
     def ifValue(self, p):
-        pass
+        return IfValue(p[0], None)
 
     @_('ID')
     def ifValue(self, p):
-        pass
+        return IfValue(None, p[0])
 
     ''' pauseOption Section'''
     @_('INT')
     def pauseOption(self, p):
-        pass
+        return PauseOption(p[0])
 
     @_('empty')  # error shift/reduce
     def pauseOption(self, p):
-        pass
+        return None
 
     ''' stopOption Section '''
     @_('INT')
     def stopOption(self, p):
-        pass
+        return StopOption(p[0])
 
     @_('empty')  # error shift/reduce
     def stopOption(self, p):
-        pass
+        return None
 
     ''' readOption Section '''
-    @_('LPAREN optionsIO RPAREN idEmpty') # error shift/reduce
+    @_('LPAREN optionsIO RPAREN idList')  # error shift/reduce
     def readOption(self, p):
-        pass
+        return OptionsIOInt(p[1], p[3])
+
+    @_('LPAREN optionsIO RPAREN')  # error shift/reduce
+    def readOption(self, p):
+        return OptionsIOInt(p[1], None)
 
     ''' writeOption Section '''
-    @_('LPAREN optionsIO RPAREN idEmpty')  # error shift/reduce
+    @_('LPAREN optionsIO RPAREN idList')  # error shift/reduce
     def writeOption(self, p):
-        pass
+        return WriteRead(p[1], p[3])
 
-    ''' idEmpty  '''
-    @_('idList')
-    def idEmpty(self, p):
-        pass
-
-    @_('empty')
-    def idEmpty(self, p):
-        pass
+    @_('LPAREN optionsIO RPAREN')  # error shift/reduce
+    def writeOption(self, p):
+        return WriteRead(p[1], None)
 
     '''  optionsIO Section'''
     @_('INT "," INT')
     def optionsIO(self, p):
-        pass
-
-    @_('ID "," INT')
-    def optionsIO(self, p):
-        pass
+        return OptionsIOInt(p[0], p[2])
 
     @_('INT')
     def optionsIO(self, p):
-        pass
+        return OptionsIOInt(p[0], None)
 
+    @_('ID "," INT')
+    def optionsIO(self, p):
+        return OptionsIOID(p[0], p[2])
+        
     @_('ID')
     def optionsIO(self, p):
-        pass
+        return OptionsIOID(p[0], None)
 
     @_('')  # empty
     def empty(self, p):
@@ -482,11 +470,10 @@ class FortranParser(Parser):
     def error(self, p):
         # Trigger the  error if there is
         print("There was an Error Reading the Grammar!.")
-        print("{}info>> {}{}".format(yellow,p,reset))
+        print("{}info>> {}{}".format(yellow, p, reset))
         if not p:
             print("{} End of File!".format(warning))
             return
-
         '''while True:
             tok = next(self.tokens, None)
             if not tok or tok.type == 'RPAREN':

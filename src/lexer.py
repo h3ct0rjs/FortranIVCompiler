@@ -3,7 +3,8 @@
 # hfjimenez@utp.edu.co, kevin_utp24@utp.edu.co
 from sly import Lexer
 from decimal import Decimal as dp
-import util
+import util.util
+
 class FortranLexer(Lexer):
     reserved_words = {'CALL', 'CONTINUE', 'DATA', 'DIMMENSION', 'DO', 'END', 'EXIT',
                       'FORMAT', 'FUNCTION', 'GOTO', 'IF', 'INT', 'INTEGER', 'PAUSE',
@@ -54,7 +55,6 @@ class FortranLexer(Lexer):
     GE = r'\.GE\.'
     NE = r'\.NE\.'
 
-
     # Triggered actions, First when tokenizer finds a word matching rule
     @_(r'CALL')
     def CALL(self, t):
@@ -71,13 +71,12 @@ class FortranLexer(Lexer):
     def t_comment(self, p):
         pass
 
-    
     @_(r'FORMAT(\s)?\(.*\)')
     def FORMAT(self, t):
         if t.value in self.reserved_words:
             t.type = t.value.upper()
         return t
-    
+
     '''
     @_(r'[\'][^\']*[\']')
     def STRING(self, t):
@@ -90,12 +89,13 @@ class FortranLexer(Lexer):
         if t.value in self.tokens:
             t.type = t.value.upper()
         return t
-    '''   
+    '''
     @_(r'(GOTO|GO\sTO)')
     def GOTO(self, t):
         if t.value in self.reserved_words:
             t.type = t.value.upper()
         return t
+
     @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
     def ID(self, t):
         if t.value in self.reserved_words:
@@ -111,7 +111,6 @@ class FortranLexer(Lexer):
     def INT(self, t):
         t.value = int(t.value)   # Convert to a numeric value
         return t
-    
 
     # Line number tracking
     @_(r'\n+')
@@ -120,5 +119,6 @@ class FortranLexer(Lexer):
 
     # Triggers the error
     def error(self, value):
-        print('{} Line {}: Bad character {}'.format(warning, self.lineno, value[0]))
+        print('{} Line {}: Bad character {}'.format(
+            warning, self.lineno, value[0]))
         self.index += 1

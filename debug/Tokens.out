@@ -6,10 +6,7 @@ Token(type='INT', value=100, lineno=2, index=56
 Token(type='RPAREN', value=')', lineno=2, index=59
 Token(type='ID', value='N', lineno=2, index=61
 Token(type='INT', value=100, lineno=3, index=66
-Token(type='FORMAT', value='FORMAT', lineno=3, index=70
-Token(type='LPAREN', value='(', lineno=3, index=76
-Token(type='ID', value='I5', lineno=3, index=77
-Token(type='RPAREN', value=')', lineno=3, index=79
+Token(type='FORMAT', value='FORMAT(I5)', lineno=3, index=70
 Token(type='ID', value='NFAC', lineno=4, index=88
 Token(type='ASSIGN', value='=', lineno=4, index=92
 Token(type='INT', value=1, lineno=4, index=93
@@ -47,9 +44,6 @@ Token(type='INT', value=110, lineno=11, index=221
 Token(type='RPAREN', value=')', lineno=11, index=224
 Token(type='ID', value='NFAC', lineno=11, index=226
 Token(type='INT', value=110, lineno=12, index=234
-Token(type='FORMAT', value='FORMAT', lineno=12, index=238
-Token(type='LPAREN', value='(', lineno=12, index=244
-Token(type='ID', value='I10', lineno=12, index=245
-Token(type='RPAREN', value=')', lineno=12, index=248
+Token(type='FORMAT', value='FORMAT(I10)', lineno=12, index=238
 Token(type='STOP', value='STOP', lineno=13, index=257
 Token(type='END', value='END', lineno=14, index=269

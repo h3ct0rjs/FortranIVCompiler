@@ -1,9 +1,8 @@
-from util import *
+from util.util import *
 from lexer import FortranLexer
 print("{} Shift Reduce Number::".format(warning))
 from parser import FortranParser
 import sys
-
 
 def parsex(data):
     lexer = FortranLexer()
