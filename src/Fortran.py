@@ -1,5 +1,6 @@
 from util.util import *
 from lexer import FortranLexer
+from viscode import *
 print("{} Shift Reduce Number::".format(warning))
 from parser import FortranParser
 import sys
@@ -38,7 +39,16 @@ def main():
             print("\n{} Starting Parsing phase.".format(ok))
             result = parsex((data))
             print("{} Creating the Abstract Syntax Tree :".format(ok))
-            result.pprint()
+            #result.pprint()
+            dot=DotCode()
+            dot.visit(result)
+            #dot.__repr__()
+            f = open('../debug/Astdot.out', 'w')
+            f.write(dot.__repr__())
+            f.close()
+
+            print(dot.__repr__())
+
             print(
                 "{} The Parsing Process is Complete and saved in ../debug/Parser.out".format(ok))
             print("{}DONE.".format(ok))

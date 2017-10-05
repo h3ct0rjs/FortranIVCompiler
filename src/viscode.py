@@ -3,7 +3,7 @@
 '''
 
 import pydotplus as pgv
-import astFortran as ast
+import astfortran as ast
 
 
 class DotCode(ast.NodeVisitor):
@@ -29,15 +29,15 @@ class DotCode(ast.NodeVisitor):
     def __repr__(self):
         return self.dot.to_string()
 
-    def new_node(self, node, label=None):
+    def new_node(self, node=None, label=None, shape="box"):
         '''
         Crea una variable temporal como nombre del nodo
         '''
         if label is None:
             label = node.__class__.__name__
         self.id += 1
-        return pgv.Node('n{}'.format(self.id), label=label)
-"""
+        return pgv.Node('n{}'.format(self.id), label=label, shape=shape)
+
     def generic_visit(self, node):
         target=self.new_node(node)
         self.dot.add_node(target)
@@ -46,7 +46,20 @@ class DotCode(ast.NodeVisitor):
             if isinstance(value, list):
                 for i in value:
                     if isinstance(i, ast.AST):
-                        self.visit(i1)
+                        self.visit(i)
+                        self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+                    elif(i is not None):
+                        targetHijo=self.new_node(label=i, shape="circle")
+                        self.dot.add_node(targetHijo)
+                        self.dot.add_edge(pgv.Edge(target, targetHijo))
+            elif isinstance(value, ast.AST):
+                self.visit(value)
+                self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+            elif(value is not None):
+                targetHijo=self.new_node(label=value, shape="circle")
+                self.dot.add_node(targetHijo)
+                self.dot.add_edge(pgv.Edge(target, targetHijo))
+        self.stack.append(target)
 """
     def visit_Program(self, node):
         target = self.new_node(node)
@@ -167,3 +180,5 @@ class DotCode(ast.NodeVisitor):
 
         self.visit(node.expression)
         self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+"""
+1
