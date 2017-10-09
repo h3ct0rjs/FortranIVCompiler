@@ -67,8 +67,6 @@ def validate_fields(**fields):
 #        _fields = ['op','left','right']
 # ----------------------------------------------------------------------
 
-# Unos pocos nodos ejemplos
-
 
 @validate_fields(statements=list)
 class Program(AST):
@@ -103,7 +101,9 @@ class CommandDimmension(AST):
 class CommandDo(AST):
     _fields = ['doOpt']
 
-# class CommandFormat
+
+class CommandFormat(AST):
+    _fields = ['formatOption']
 
 
 class CommandFunction(AST):
@@ -275,6 +275,18 @@ class DoOption(AST):
     _fields = ['INT0', 'variable', 'INT1', 'INT2', 'INT3']
 
 
+@validate_fields(convers=list, strlist=list, hstrlist=list, ints=list, times=list)
+class FormatOptList(AST):
+    _fields = ['convers', 'strlist', 'hstrlist', 'ints', 'times']
+
+    def append(self, conver, string, hString, int, time):
+        self.convers.append(conver)
+        self.strlist.append(string)
+        self.hstrlist.append(hString)
+        self.ints.append(int)
+        self.times.append(time)
+        
+
 class GotoOptionInt(AST):
     _fields = ['INT']
 
@@ -284,11 +296,7 @@ class GotoOptionIntlist(AST):
 
 
 class IfOption(AST):
-    _fields = ['ifValue0', 'ifValue1', 'ifValue2']
-
-
-class IfValue(AST):
-    _fields = ['INT', 'ID']
+    _fields = ['INT0', 'INT1', 'INT2']
 
 
 class PauseOption(AST):
@@ -304,7 +312,7 @@ class WriteRead(AST):
 
 
 class OptionsIOInt(AST):
-    _fields = ['INT', 'INT']
+    _fields = ['INT0', 'INT1']
 
 
 class OptionsIOID(AST):

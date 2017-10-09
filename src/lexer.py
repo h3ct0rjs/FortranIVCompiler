@@ -14,9 +14,10 @@ class FortranLexer(Lexer):
     logicaloperator = {'NOT', 'AND', 'OR'}
     # Set of token names.
     tokens = {
+        'CONVERSION',
         'ID',
-        #'STRING',
-        #'HSTRING',
+        'STRING',
+        'HSTRING',
         'PLUS',
         'MINUS',
         'TIMES',
@@ -71,13 +72,19 @@ class FortranLexer(Lexer):
     def t_comment(self, p):
         pass
 
+    '''
     @_(r'FORMAT(\s)?\(.*\)')
     def FORMAT(self, t):
         if t.value in self.reserved_words:
             t.type = t.value.upper()
         return t
-
     '''
+    @_(r'[1-9]?((A|I)[1-9][0-9]*|(F|E)[1-9][0-9]*\.[1-9][0-9]*|[1-9][0-9]*X)')
+    def CONVERSION(self, t):
+        if t.value in self.tokens:
+            t.type = t.value.upper()
+        return t
+
     @_(r'[\'][^\']*[\']')
     def STRING(self, t):
         if t.value in self.tokens:
@@ -89,7 +96,7 @@ class FortranLexer(Lexer):
         if t.value in self.tokens:
             t.type = t.value.upper()
         return t
-    '''
+    
     @_(r'(GOTO|GO\sTO)')
     def GOTO(self, t):
         if t.value in self.reserved_words:

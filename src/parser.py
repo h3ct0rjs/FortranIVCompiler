@@ -91,9 +91,9 @@ class FortranParser(Parser):
     def command(self, p):
         return p[0]
 
-    @_('FORMAT')
+    @_('FORMAT LPAREN formatOption RPAREN')
     def command(self, p):
-        return p[0]
+        return CommandFormat(p[2])
 
     @_('FUNCTION ID LPAREN varlist RPAREN')
     def command(self, p):
@@ -146,11 +146,11 @@ class FortranParser(Parser):
     ''' variable Section '''
     @_('ID LPAREN expr "," expr RPAREN')
     def variable(self, p):
-        return Variable(p[0], p[1], p[4])
+        return Variable(p[0], p[2], p[4])
 
     @_('ID LPAREN expr RPAREN')
     def variable(self, p):
-        return Variable(p[0], p[1], None)
+        return Variable(p[0], p[2], None)
 
     @_('ID')
     def variable(self, p):
@@ -240,7 +240,7 @@ class FortranParser(Parser):
 
     @_('NOT relexpr %prec UNOT')
     def relexpr(self, p):
-        return NotRelExpr(p[0], p[1], p[2])
+        return NotRelExpr(p[0], p[1])
 
     @_('expr')
     def relexpr(self, p):
@@ -268,7 +268,6 @@ class FortranParser(Parser):
     @_('idList "," ID')
     def idList(self, p):
         p[0].append(p[2])
-
         return IdList(p[0])
 
     @_('ID')
@@ -307,7 +306,8 @@ class FortranParser(Parser):
     '''  dimmensionOption Section  '''
     @_('dimmensionOption "," ID LPAREN intlist RPAREN')
     def dimmensionOption(self, p):
-        p[0].append(p[2], p[5])
+        p[0].append(p[2], p[4])
+        return p[0]
 
     @_('ID LPAREN intlist RPAREN')
     def dimmensionOption(self, p):
@@ -316,7 +316,7 @@ class FortranParser(Parser):
     '''  intlist Section'''
     @_('intlist "," INT')
     def intlist(self, p):
-        p[0].append(p[1])
+        p[0].append(p[2])
         return p[0]
 
     @_('INT')
@@ -332,61 +332,54 @@ class FortranParser(Parser):
     def doOption(self, p):
         return DoOption(p[0], p[1], p[3], p[5], None)
 
-    ''' formatOption Section 
-    @_('formatOption "," formatOption')
+    ''' formatOption Section '''
+    @_('formatOption "," CONVERSION',
+        'formatOption "/" CONVERSION')
     def formatOption(self, p):
-        pass
+        p[0].append(p[2], None, None, None, None)
+        return p[0]
+    
+    @_('formatOption "," STRING',
+        'formatOption "/" STRING')
+    def formatOption(self, p):
+        p[0].append(None, p[2], None, None, None)
+        return p[0]
 
-    @_('formatOption "/" formatOption')
+    @_('formatOption "," HSTRING',
+        'formatOption "/" HSTRING')
     def formatOption(self, p):
-        pass
+        p[0].append(None, None, p[2], None, None)
+        return p[0]
+
+    @_('formatOption "," INT LPAREN formatOption RPAREN',
+        'formatOption "/" INT LPAREN formatOption RPAREN')
+    def formatOption(self, p):
+        p[0].append(None, None, None, p[2], p[4])
+        return p[0]
+
+    @_('CONVERSION')
+    def formatOption(self, p):
+        return FormatOptList([p[0]], [None], [None], [None], [None])
+
+    @_('STRING')
+    def formatOption(self, p):
+        return FormatOptList([None], [p[0]], [None], [None], [None])
+
+    @_('HSTRING')
+    def formatOption(self, p):
+        return FormatOptList([None], [None], [p[0]], [None], [None])
 
     @_('INT LPAREN formatOption RPAREN')
     def formatOption(self, p):
-        pass
+        return FormatOptList([None], [None], [None], [p[0]], [p[2]])
 
-    @_('LPAREN formatOption RPAREN')
+    @_('DIVIDE formatOption')
     def formatOption(self, p):
-        pass
-
-    @_('conversion')
-    def formatOption(self, p):
-        pass
-
-    @_('string')
-    def formatOption(self, p):
-        pass
+        return p[1]
 
     @_('empty')
     def formatOption(self, p):
-        pass
-    '''
-    ''' conversion Section
-    @_('INT ID')
-    def conversion(self, p):
-        pass
-
-    @_('ID INT "." INT')
-    def conversion(self, p):
-        pass
-
-    @_('ID INT')
-    def conversion(self, p):
-        pass
-
-    @_('ID z')
-    def conversion(self, p):
-        pass
-    '''
-    ''' string Section 
-    @_('STRING')
-    def string(self, p):
-        pass
-
-    @_('HSTRING')
-    def string(self, p):
-        pass
-    '''
+        return None
 
     ''' gotoOption Section '''
     @_('INT')
@@ -398,17 +391,9 @@ class FortranParser(Parser):
         return GotoOptionIntList(p[1], p[4])
 
     ''' ifOption Section '''
-    @_('ifValue "," ifValue "," ifValue')
+    @_('INT "," INT "," INT')
     def ifOption(self, p):
         return IfOption(p[0], p[2], p[4])
-
-    @_('INT')
-    def ifValue(self, p):
-        return IfValue(p[0], None)
-
-    @_('ID')
-    def ifValue(self, p):
-        return IfValue(None, p[0])
 
     ''' pauseOption Section'''
     @_('INT')
@@ -431,11 +416,11 @@ class FortranParser(Parser):
     ''' readOption Section '''
     @_('LPAREN optionsIO RPAREN idList')  # error shift/reduce
     def readOption(self, p):
-        return OptionsIOInt(p[1], p[3])
+        return WriteRead(p[1], p[3])
 
     @_('LPAREN optionsIO RPAREN')  # error shift/reduce
     def readOption(self, p):
-        return OptionsIOInt(p[1], None)
+        return WriteRead(p[1], None)
 
     ''' writeOption Section '''
     @_('LPAREN optionsIO RPAREN idList')  # error shift/reduce
