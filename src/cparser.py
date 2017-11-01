@@ -202,15 +202,15 @@ class FortranParser(Parser):
 
     @_('INT')
     def expr(self, p):
-        return p[0]
+        return ExprSingle(p[0], None, None)
 
     @_('RREAL')
     def expr(self, p):
-        return p[0]
+        return ExprSingle(None, p[0], None)
 
     @_('variable')
     def expr(self, p):
-        return p[0]
+        return ExprSingle(None, None, p[0])
 
     ''' exprlist Section '''
     @_('exprlist "," expr')
@@ -244,7 +244,7 @@ class FortranParser(Parser):
 
     @_('expr')
     def relexpr(self, p):
-        return p[0]
+        return RelexprSingle(p[0])
 
     ''' callOption Section  '''
     @_('ID LPAREN idList RPAREN')
