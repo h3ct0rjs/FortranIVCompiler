@@ -101,10 +101,21 @@ class CommandDimmension(AST):
 class CommandDo(AST):
     _fields = ['doOpt']
 
-
+'''
 class CommandFormat(AST):
     _fields = ['formatOption']
+'''
 
+@validate_fields(convers=list, strlist=list, hstrlist=list, ints=list, times=list)
+class CommandFormat(AST):
+    _fields = ['convers', 'strlist', 'hstrlist', 'ints', 'times']
+
+    def append(self, conver, string, hString, int, time):
+        self.convers.append(conver)
+        self.strlist.append(string)
+        self.hstrlist.append(hString)
+        self.ints.append(int)
+        self.times.append(time)
 
 class CommandFunction(AST):
     _fields = ['ID', 'varlist']
@@ -131,7 +142,7 @@ class CommandReal(AST):
 
 
 class CommandRead(AST):
-    _fields = ['readOpt']
+    _fields = ['optionsIO', 'idList']
 
 
 class CommandStop(AST):
@@ -143,7 +154,7 @@ class CommandSubroutine(AST):
 
 
 class CommandWrite(AST):
-    _fields = ['writeOption']
+    _fields = ['optionsIO', 'idList']
 
 '''variable Section'''
 
@@ -274,7 +285,7 @@ class Intlist(AST):
 class DoOption(AST):
     _fields = ['INT0', 'variable', 'INT1', 'INT2', 'INT3']
 
-
+'''
 @validate_fields(convers=list, strlist=list, hstrlist=list, ints=list, times=list)
 class FormatOptList(AST):
     _fields = ['convers', 'strlist', 'hstrlist', 'ints', 'times']
@@ -285,7 +296,7 @@ class FormatOptList(AST):
         self.hstrlist.append(hString)
         self.ints.append(int)
         self.times.append(time)
-        
+'''
 
 class GotoOptionInt(AST):
     _fields = ['INT']

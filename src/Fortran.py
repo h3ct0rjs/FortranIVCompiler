@@ -46,7 +46,6 @@ def main():
             f = open('../debug/Astdot.out', 'w')
             f.write(dot.__repr__())
             f.close()
-
             print(dot.__repr__())
 
             print(

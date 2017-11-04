@@ -56,11 +56,11 @@ class FortranParser(Parser):
     '''statement Section'''
     @_('INT command')
     def statement(self, p):
-        return Statement(p[0], p[1])
+        return p[1]
 
     @_('command')
     def statement(self, p):
-        return Statement(None, p[0])
+        return p[0]
 
     '''command Section'''
     @_('variable ASSIGN expr')
@@ -93,7 +93,7 @@ class FortranParser(Parser):
 
     @_('FORMAT LPAREN formatOption RPAREN')
     def command(self, p):
-        return CommandFormat(p[2])
+        return CommandFormat(p[2][0], p[2][1], p[2][2], p[2][3], p[2][4])
 
     @_('FUNCTION ID LPAREN varlist RPAREN')
     def command(self, p):
@@ -121,7 +121,7 @@ class FortranParser(Parser):
 
     @_('READ readOption')
     def command(self, p):
-        return CommandRead(p[1])
+        return CommandRead(p[1][0], p[1][1])
 
     @_('RETURN')
     def command(self, p):
@@ -137,7 +137,7 @@ class FortranParser(Parser):
 
     @_('WRITE writeOption')
     def command(self, p):
-        return CommandWrite(p[1])
+        return CommandWrite(p[1][0], p[1][1])
 
     """
     class Idexpresiob(AST):
@@ -154,7 +154,7 @@ class FortranParser(Parser):
 
     @_('ID')
     def variable(self, p):
-        return Variable(p[0], None, None)
+        return p[0]
 
     '''  varlist Section '''
     @_('varlist "," variable')
@@ -202,15 +202,15 @@ class FortranParser(Parser):
 
     @_('INT')
     def expr(self, p):
-        return ExprSingle(p[0], None, None)
+        return p[0]
 
     @_('RREAL')
     def expr(self, p):
-        return ExprSingle(None, p[0], None)
+        return p[0]
 
     @_('variable')
     def expr(self, p):
-        return ExprSingle(None, None, p[0])
+        return p[0]
 
     ''' exprlist Section '''
     @_('exprlist "," expr')
@@ -244,7 +244,7 @@ class FortranParser(Parser):
 
     @_('expr')
     def relexpr(self, p):
-        return RelexprSingle(p[0])
+        return p[0]
 
     ''' callOption Section  '''
     @_('ID LPAREN idList RPAREN')
@@ -338,7 +338,7 @@ class FortranParser(Parser):
     def formatOption(self, p):
         p[0].append(p[2], None, None, None, None)
         return p[0]
-    
+
     @_('formatOption "," STRING',
         'formatOption "/" STRING')
     def formatOption(self, p):
@@ -359,19 +359,19 @@ class FortranParser(Parser):
 
     @_('CONVERSION')
     def formatOption(self, p):
-        return FormatOptList([p[0]], [None], [None], [None], [None])
+        return [[p[0]], [None], [None], [None], [None]]
 
     @_('STRING')
     def formatOption(self, p):
-        return FormatOptList([None], [p[0]], [None], [None], [None])
+        return [[None], [p[0]], [None], [None], [None]]
 
     @_('HSTRING')
     def formatOption(self, p):
-        return FormatOptList([None], [None], [p[0]], [None], [None])
+        return [[None], [None], [p[0]], [None], [None]]
 
     @_('INT LPAREN formatOption RPAREN')
     def formatOption(self, p):
-        return FormatOptList([None], [None], [None], [p[0]], [p[2]])
+        return [[None], [None], [None], [p[0]], [p[2]]]
 
     @_('DIVIDE formatOption')
     def formatOption(self, p):
@@ -384,7 +384,7 @@ class FortranParser(Parser):
     ''' gotoOption Section '''
     @_('INT')
     def gotoOption(self, p):
-        return GotoOptionInt(p[0])
+        return p[0]
 
     @_('LPAREN intlist RPAREN "," variable')
     def gotoOption(self, p):
@@ -416,20 +416,20 @@ class FortranParser(Parser):
     ''' readOption Section '''
     @_('LPAREN optionsIO RPAREN idList')  # error shift/reduce
     def readOption(self, p):
-        return WriteRead(p[1], p[3])
+        return [p[1], p[3]]
 
     @_('LPAREN optionsIO RPAREN')  # error shift/reduce
     def readOption(self, p):
-        return WriteRead(p[1], None)
+        return [p[1], None]
 
     ''' writeOption Section '''
     @_('LPAREN optionsIO RPAREN idList')  # error shift/reduce
     def writeOption(self, p):
-        return WriteRead(p[1], p[3])
+        return [p[1], p[3]]
 
     @_('LPAREN optionsIO RPAREN')  # error shift/reduce
     def writeOption(self, p):
-        return WriteRead(p[1], None)
+        return [p[1], None]
 
     '''  optionsIO Section'''
     @_('INT "," INT')
@@ -443,7 +443,7 @@ class FortranParser(Parser):
     @_('ID "," INT')
     def optionsIO(self, p):
         return OptionsIOID(p[0], p[2])
-        
+
     @_('ID')
     def optionsIO(self, p):
         return OptionsIOID(p[0], None)
