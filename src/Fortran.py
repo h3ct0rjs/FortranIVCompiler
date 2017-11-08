@@ -19,7 +19,6 @@ def main():
         raise SystemExit(1)
     else:
         lexer = FortranLexer()
-
         parser = FortranParser()
         data = open(sys.argv[1]).read()
         # print('{}'.format(data))                   #Debug the tokens
@@ -47,7 +46,7 @@ def main():
             f.write(dot.__repr__())
             f.close()
 
-            print(dot.__repr__())
+            #print(dot.__repr__())
 
             print(
                 "{} The Parsing Process is Complete and saved in ../debug/Parser.out".format(ok))

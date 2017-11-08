@@ -268,7 +268,7 @@ class FortranParser(Parser):
     @_('idList "," ID')
     def idList(self, p):
         p[0].append(p[2])
-        return IdList(p[0])
+        return p[0]
 
     @_('ID')
     def idList(self, p):

@@ -26,6 +26,22 @@ class DotCode(ast.NodeVisitor):
             shape='box', color='lightgray', style='filled')
         self.dot.set_edge_defaults(arrowhead='none')
 
+        # variables de control
+        self.pasecommandread = False
+        self.pasecommandwrite = False
+        self.paseAssing = False
+
+        # listas de simbolos
+        self.valoresEnteros = "IJKLMN"
+        self.valoresInt = [["I", None], ["J", None], [
+            "K", None], ["L", None], ["M", None], ["N", None]]
+
+        self.valoresFlotantes = "ABCDEFGHIOPQRSTUVWXYZ"
+        self.valoresFloat = []
+
+    def existevalor(self, valueid, node):
+        pass
+
     def __repr__(self):
         return self.dot.to_string()
 
@@ -39,7 +55,7 @@ class DotCode(ast.NodeVisitor):
         return pgv.Node('n{}'.format(self.id), label=label, shape=shape)
 
     def generic_visit(self, node):
-        target=self.new_node(node)
+        target = self.new_node(node)
         self.dot.add_node(target)
         for field in getattr(node, "_fields"):
             value = getattr(node, field, None)
@@ -49,17 +65,132 @@ class DotCode(ast.NodeVisitor):
                         self.visit(i)
                         self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
                     elif(i is not None):
-                        targetHijo=self.new_node(label=i, shape="circle")
+                        targetHijo = self.new_node(label=i, shape="circle")
                         self.dot.add_node(targetHijo)
                         self.dot.add_edge(pgv.Edge(target, targetHijo))
             elif isinstance(value, ast.AST):
                 self.visit(value)
                 self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
             elif(value is not None):
-                targetHijo=self.new_node(label=value, shape="circle")
+                targetHijo = self.new_node(label=value, shape="circle")
                 self.dot.add_node(targetHijo)
                 self.dot.add_edge(pgv.Edge(target, targetHijo))
         self.stack.append(target)
+
+    def visit_Program(self, node):
+        target = self.new_node(node)
+        self.dot.add_node(target)
+
+        for field in getattr(node, "_fields"):
+            value = getattr(node, field, None)
+            if isinstance(value, list):
+                for i in value:
+                    if isinstance(i, ast.AST):
+                        self.visit(i)
+                        self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+        #print("Tabla de simbolos:")
+        # for i in self.valoresInt:
+        #    if i[1] is None:
+        #        pass
+        #    else:
+                print("valores int {}".format(self.valoresInt))
+                print("valores float {}".format(self.valoresFloat))
+        self.stack.append(target)
+
+    def visit_CommandRead(self, node):
+        target = self.new_node(node)
+        self.dot.add_node(target)
+        self.pasecommandread = True
+        for field in getattr(node, "_fields"):
+            value = getattr(node, field, None)
+            if isinstance(value, ast.AST):
+                self.visit(value)
+                self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+        self.pasecommandread = False
+        self.stack.append(target)
+
+    def visit_CommandWrite(self, node):
+        target = self.new_node(node)
+        self.dot.add_node(target)
+        self.pasecommandwrite = True
+        for field in getattr(node, "_fields"):
+            value = getattr(node, field, None)
+            if isinstance(value, ast.AST):
+                self.visit(value)
+                self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+        self.pasecommandwrite = False
+        self.stack.append(target)
+
+    def visit_IdList(self, node):
+        target = self.new_node(node)
+        self.dot.add_node(target)
+        for field in getattr(node, "_fields"):
+            value = getattr(node, field, None)
+            if isinstance(value, list):
+                for i in value:
+                    if(i is not None):
+                        if(self.pasecommandread):
+                            print("estoy en writeRead de read con:", i)
+                            existe = False
+                            if i in self.valoresEnteros:
+                                for j in self.valoresInt:
+                                    if(j[0] == i):
+                                        existe = True
+                                        j[1] = "Read"
+                            elif i in self.valoresFlotantes:
+                                for k in self.valoresFloat:
+                                    if(k[0] == i):
+                                        existe = True
+                                        k[1] = "Read"
+                            if not existe:
+                                if i[0] in self.valoresEnteros:
+                                    self.valoresInt.append([i, "Read"])
+                                    existe = True
+                                if i[0] in self.valoresFlotantes:
+                                    self.valoresFloat.append([i, "Read"])
+                                    existe = True
+                        # if(self.pasecommandwrite):
+
+                        targetHijo = self.new_node(label=i, shape="circle")
+                        self.dot.add_node(targetHijo)
+                        self.dot.add_edge(pgv.Edge(target, targetHijo))
+        self.stack.append(target)
+
+    def visit_Assign(self, node):
+        target = self.new_node(node)
+        self.dot.add_node(target)
+        self.paseAssign = True
+        for field in getattr(node, "_fields"):
+            value = getattr(node, field, None)
+            if isinstance(value, ast.AST):
+                self.visit(value)
+                self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
+        self.paseAssign = False
+        self.stack.append(target)
+
+    def visit_Variable(self, node):
+        target = self.new_node(node)
+        self.dot.add_node(target)
+        for field in getattr(node, "_fields"):
+            value = getattr(node, field, None)
+            if(value is not None):
+                if self.paseAssign:
+                    if value[0] in self.valoresEnteros:
+                        for i in self.valoresInt:
+                            if i[0] == value and i[1] == None:
+                                pass  # revisar
+                            if i[0] == value and i[1] != None:
+                                pass  # revisar
+
+                    elif value[0] in self.valoresFlotantes:
+                        pass
+
+                targetHijo = self.new_node(label=value, shape="circle")
+                self.dot.add_node(targetHijo)
+                self.dot.add_edge(pgv.Edge(target, targetHijo))
+        self.stack.append(target)
+
+
 """
     def visit_Program(self, node):
         target = self.new_node(node)
@@ -181,4 +312,3 @@ class DotCode(ast.NodeVisitor):
         self.visit(node.expression)
         self.dot.add_edge(pgv.Edge(target, self.stack.pop()))
 """
-1
